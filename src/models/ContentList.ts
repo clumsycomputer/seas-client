@@ -11,7 +11,6 @@ export interface ContentList {
 export type ContentListRating = 'safeForWork' | 'notSafeForWork'
 
 export interface ContentItem {
-  contentId: string
   contentTitle: string
   contentProducer: string
   contentLinks: Array<{

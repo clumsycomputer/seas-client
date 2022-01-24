@@ -26,7 +26,6 @@ export const appData: {
       },
       contentListItems: [
         {
-          contentId: '0',
           contentTitle: 'Los Angeles',
           contentProducer: 'Totally Enormous Extinct Dinosaurs',
           contentLinks: [
@@ -41,7 +40,6 @@ export const appData: {
           ],
         },
         {
-          contentId: '7',
           contentTitle: 'Das Wort',
           contentProducer: 'DJ Koze',
           contentLinks: [
@@ -56,7 +54,6 @@ export const appData: {
           ],
         },
         {
-          contentId: '11',
           contentTitle: 'Sooner',
           contentProducer: 'WhoMadeWho',
           contentLinks: [
@@ -72,7 +69,6 @@ export const appData: {
           ],
         },
         {
-          contentId: '8',
           contentTitle: 'All I Ever Need',
           contentProducer: 'Caribou',
           contentLinks: [
@@ -88,7 +84,6 @@ export const appData: {
           ],
         },
         {
-          contentId: '3',
           contentTitle: 'Love Divide',
           contentProducer: 'Ross From Friends',
           contentLinks: [
@@ -103,7 +98,6 @@ export const appData: {
           ],
         },
         {
-          contentId: '12',
           contentTitle: 'Such A Bad Way',
           contentProducer: 'Against All Logic',
           contentLinks: [
@@ -119,7 +113,6 @@ export const appData: {
           ],
         },
         {
-          contentId: '9',
           contentTitle: 'Turn It All Down',
           contentProducer: 'Bibio',
           contentLinks: [
@@ -135,7 +128,6 @@ export const appData: {
           ],
         },
         {
-          contentId: '3',
           contentTitle: 'Hustler',
           contentProducer: 'Simian Mobile Disco',
           contentLinks: [
@@ -150,7 +142,6 @@ export const appData: {
           ],
         },
         {
-          contentId: '13',
           contentTitle: 'Topdown',
           contentProducer: 'Channel Tres',
           contentLinks: [
@@ -166,7 +157,6 @@ export const appData: {
           ],
         },
         {
-          contentId: '14',
           contentTitle: 'Let U No',
           contentProducer: 'Dj Rashad',
           contentLinks: [

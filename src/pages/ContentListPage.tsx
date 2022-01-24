@@ -5,7 +5,7 @@ import { LinkLabel } from '../components/LinkLabel'
 import { NsfwLabel } from '../components/NsfwLabel'
 import { PageContainer } from '../components/PageContainer'
 import { TextLabel } from '../components/TextLabel'
-import { ContentList, ContentItem } from '../models/ContentList'
+import { ContentItem, ContentList } from '../models/ContentList'
 
 export interface ContentListPageProps {}
 
