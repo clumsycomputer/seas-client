@@ -12,9 +12,9 @@ export type ContentListRating = 'safeForWork' | 'notSafeForWork'
 
 export interface ContentItem {
   contentTitle: string
-  contentProducer: string
-  contentLinks: Array<{
+  contentAuthor: string
+  contentLink: {
     contentHostName: string
     contentHref: string
-  }>
+  }
 }

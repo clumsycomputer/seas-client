@@ -25,8 +25,8 @@ export function ContentListPage(props: ContentListPageProps) {
             <ContentListItem
               key={`${someContentItemIndex}`}
               contentTitle={someContentItem.contentTitle}
-              contentProducer={someContentItem.contentProducer}
-              contentLinks={someContentItem.contentLinks}
+              contentAuthor={someContentItem.contentAuthor}
+              contentLink={someContentItem.contentLink}
             />
           )
         }
@@ -83,29 +83,21 @@ const useContentListHeaderStyles = createUseStyles((theme: AppTheme) => {
 })
 
 interface ContentListItemProps
-  extends Pick<
-    ContentItem,
-    'contentTitle' | 'contentProducer' | 'contentLinks'
-  > {}
+  extends Pick<ContentItem, 'contentTitle' | 'contentAuthor' | 'contentLink'> {}
 
 function ContentListItem(props: ContentListItemProps) {
-  const { contentTitle, contentProducer, contentLinks } = props
+  const { contentTitle, contentAuthor, contentLink } = props
   const styles = useContentItemStyles()
   return (
     <div className={styles.itemContainer}>
       <div className={styles.itemDivider}></div>
       <TextLabel displayText={contentTitle} />
-      <TextLabel displayText={contentProducer} />
+      <TextLabel displayText={contentAuthor} />
       <div className={styles.linksContainer}>
-        {contentLinks.map((someContentLink, contentLinkIndex) => {
-          return (
-            <LinkLabel
-              key={`${contentLinkIndex}`}
-              displayText={someContentLink.contentHostName}
-              linkHref={someContentLink.contentHref}
-            />
-          )
-        })}
+        <LinkLabel
+          displayText={contentLink.contentHostName}
+          linkHref={contentLink.contentHref}
+        />
       </div>
     </div>
   )
