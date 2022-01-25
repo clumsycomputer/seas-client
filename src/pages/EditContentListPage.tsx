@@ -1,27 +1,29 @@
 import { useState } from 'react'
+import { appData } from '../appData'
 import { ContentListFormPage } from '../components/ContentListFormPage'
 import { ContentList } from '../models/ContentList'
 
-export function CreateContentListPage() {
+export function EditContentListPage() {
   const [formState, setFormState] = useState<
     Pick<
       ContentList,
       'contentListTitle' | 'contentListRating' | 'contentListItems'
     >
-  >({
-    contentListTitle: '',
-    contentListRating: 'safeForWork',
-    contentListItems: [],
-  })
+  >(appData.contentLists['aaa'])
   return (
     <ContentListFormPage
-      formTitle={'Create List'}
+      formTitle={'Edit List'}
       formState={formState}
       setFormState={setFormState}
       formActions={[
         {
           disabled: false,
-          buttonLabel: '✓ Publish List',
+          buttonLabel: '✓ Update List',
+          onClick: () => {},
+        },
+        {
+          disabled: false,
+          buttonLabel: '- Delete List',
           onClick: () => {},
         },
         {

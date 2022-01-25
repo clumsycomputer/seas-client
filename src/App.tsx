@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import { ContentListPage } from './pages/ContentListPage'
 import { CreateContentListPage } from './pages/CreateContentListPage'
+import { EditContentListPage } from './pages/EditContentListPage'
 import { UserProfilePage } from './pages/UserProfilePage'
 
 export default App
@@ -10,12 +11,16 @@ function App() {
     <Routes>
       <Route path={'/user/:userAccountId'} element={<UserProfilePage />} />
       <Route
+        path={'/content-list/create'}
+        element={<CreateContentListPage />}
+      />
+      <Route
         path={'/content-list/:contentListId'}
         element={<ContentListPage />}
       />
       <Route
-        path={'/content-list/create'}
-        element={<CreateContentListPage />}
+        path={'/content-list/:contentListId/edit'}
+        element={<EditContentListPage />}
       />
     </Routes>
   )
