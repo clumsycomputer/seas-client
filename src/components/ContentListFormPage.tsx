@@ -1,7 +1,10 @@
 import { createUseStyles } from 'react-jss'
 import { AppTheme } from '../appTheme'
 import { ContentList } from '../models/ContentList'
+import { ActionButton, ActionButtonProps } from './ActionButton'
 import { PageContainer } from './PageContainer'
+import { PageHeader } from './PageHeader'
+import { TextField } from './TextField'
 
 export interface ContentListFormPageProps {
   formTitle: string
@@ -25,15 +28,7 @@ export function ContentListFormPage(props: ContentListFormPageProps) {
   const styles = useStyles()
   return (
     <PageContainer>
-      <div className={styles.formHeaderContainer}>
-        <div className={styles.formTitleContainer}>
-          <div className={styles.formTitle}>
-            {formTitle}
-            <div className={styles.formtTitleUnderline} />
-          </div>
-        </div>
-        <div className={styles.formTitleSpacer} />
-      </div>
+      <PageHeader pageTitle={formTitle} />
       <form className={styles.formInputsContainer}>
         <div className={styles.titleRowContainer}>
           <TextField
@@ -312,66 +307,12 @@ const useStyles = createUseStyles((appTheme: AppTheme) => {
       paddingTop: appTheme.spacing(2),
       display: 'flex',
       flexDirection: 'row',
-      justifyContent: 'flex-end',
       flexWrap: 'wrap',
+      justifyContent: 'flex-end',
     },
     pageFooterSpacer: {
       height: appTheme.spacing(3),
     },
-  }
-})
-
-interface TextFieldProps
-  extends Required<
-    Pick<
-      React.DetailedHTMLProps<
-        React.InputHTMLAttributes<HTMLInputElement>,
-        HTMLInputElement
-      >,
-      'onChange' | 'value'
-    >
-  > {
-  fieldLabel: string
-}
-
-function TextField(props: TextFieldProps) {
-  const { fieldLabel, onChange, value } = props
-  const styles = useTextFieldStyles()
-  return (
-    <div className={styles.fieldContainer}>
-      <div className={styles.fieldLabelContainer}>
-        <div className={styles.fieldLabel}>{fieldLabel}</div>
-      </div>
-      <div className={styles.fieldInputContainer}>
-        <input
-          onChange={onChange}
-          value={value}
-          className={styles.fieldInput}
-          type={'text'}
-        />
-      </div>
-    </div>
-  )
-}
-
-const useTextFieldStyles = createUseStyles((appTheme: AppTheme) => {
-  return {
-    fieldContainer: {
-      flexShrink: 1,
-      padding: appTheme.spacing(1),
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    fieldLabelContainer: {
-      display: 'flex',
-      alignItems: 'flex-end',
-      paddingBottom: appTheme.spacing(1 / 4),
-    },
-    fieldLabel: {
-      fontWeight: 400,
-    },
-    fieldInputContainer: {},
-    fieldInput: {},
   }
 })
 
@@ -437,50 +378,6 @@ const useCheckboxFieldStyles = createUseStyles((appTheme: AppTheme) => {
       margin: appTheme.spacing(0),
       width: 21,
       height: 21,
-    },
-  }
-})
-
-interface ActionButtonProps
-  extends Required<
-    Pick<
-      React.DetailedHTMLProps<
-        React.ButtonHTMLAttributes<HTMLButtonElement>,
-        HTMLButtonElement
-      >,
-      'onClick' | 'disabled'
-    >
-  > {
-  buttonLabel: string
-}
-
-function ActionButton(props: ActionButtonProps) {
-  const { disabled, onClick, buttonLabel } = props
-  const styles = useActionButtonStyles()
-  return (
-    <div className={styles.buttonContainer}>
-      <button
-        className={styles.actionButton}
-        type={'button'}
-        disabled={disabled}
-        onClick={onClick}
-      >
-        {buttonLabel}
-      </button>
-    </div>
-  )
-}
-
-const useActionButtonStyles = createUseStyles((appTheme: AppTheme) => {
-  return {
-    buttonContainer: {
-      flexShrink: 0,
-      padding: appTheme.spacing(1),
-      display: 'flex',
-      flexDirection: 'row',
-    },
-    actionButton: {
-      flexGrow: 1,
     },
   }
 })

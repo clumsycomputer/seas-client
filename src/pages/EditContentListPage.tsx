@@ -28,7 +28,7 @@ export function EditContentListPage() {
         },
         {
           disabled: false,
-          buttonLabel: '✕ Cancel Changes',
+          buttonLabel: '✕ Cancel',
           onClick: () => {},
         },
       ]}
