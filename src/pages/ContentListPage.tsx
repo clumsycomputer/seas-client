@@ -1,5 +1,6 @@
+import { Fragment, ReactNode, useEffect, useState } from 'react'
 import { createUseStyles } from 'react-jss'
-import { appData } from '../appData'
+import { useParams } from 'react-router-dom'
 import { AppTheme } from '../appTheme'
 import { LinkLabel } from '../components/LinkLabel'
 import { NsfwLabel } from '../components/NsfwLabel'
@@ -11,29 +12,40 @@ export interface ContentListPageProps {}
 
 export function ContentListPage(props: ContentListPageProps) {
   const styles = useContentListPageStyles()
-  const contentList = appData.contentLists['aaa']
-  return (
-    <PageContainer>
-      <ContentListHeader
-        contentListTitle={contentList.contentListTitle}
-        contentListCurator={contentList.contentListCurator}
-        contentListRating={contentList.contentListRating}
-      />
-      {contentList.contentListItems.map(
-        (someContentItem, someContentItemIndex) => {
-          return (
-            <ContentListItem
-              key={`${someContentItemIndex}`}
-              contentItemTitle={someContentItem.contentItemTitle}
-              contentItemAuthor={someContentItem.contentItemAuthor}
-              contentItemLinks={someContentItem.contentItemLinks}
-            />
-          )
-        }
-      )}
-      <div className={styles.footerSpacer} />
-    </PageContainer>
+  const routeParams = useParams()
+  const [pageContent, setPageContent] = useState<ReactNode>(
+    <div>Loading...</div>
   )
+  useEffect(() => {
+    fetch(`http://localhost:8000/content-list/${routeParams.contentListId}`)
+      .then((getContentListResponse) => getContentListResponse.json())
+      .then((contentListResponseData: unknown) => {
+        const contentList = contentListResponseData as ContentList
+        setPageContent(
+          <Fragment>
+            <ContentListHeader
+              contentListTitle={contentList.contentListTitle}
+              contentListAuthor={contentList.contentListAuthor}
+              contentListRating={contentList.contentListRating}
+            />
+            {contentList.contentListItems.map(
+              (someContentItem, someContentItemIndex) => {
+                return (
+                  <ContentListItem
+                    key={`${someContentItemIndex}`}
+                    contentItemTitle={someContentItem.contentItemTitle}
+                    contentItemAuthor={someContentItem.contentItemAuthor}
+                    contentItemLinks={someContentItem.contentItemLinks}
+                  />
+                )
+              }
+            )}
+            <div className={styles.footerSpacer} />
+          </Fragment>
+        )
+      })
+  }, [])
+  return <PageContainer>{pageContent}</PageContainer>
 }
 
 const useContentListPageStyles = createUseStyles((theme: AppTheme) => {
@@ -52,11 +64,11 @@ const useContentListPageStyles = createUseStyles((theme: AppTheme) => {
 interface ContentListHeaderProps
   extends Pick<
     ContentList,
-    'contentListTitle' | 'contentListCurator' | 'contentListRating'
+    'contentListTitle' | 'contentListAuthor' | 'contentListRating'
   > {}
 
 function ContentListHeader(props: ContentListHeaderProps) {
-  const { contentListTitle, contentListCurator, contentListRating } = props
+  const { contentListTitle, contentListAuthor, contentListRating } = props
   const styles = useContentListHeaderStyles()
   return (
     <div className={styles.headerContainer}>
@@ -64,7 +76,7 @@ function ContentListHeader(props: ContentListHeaderProps) {
         <TextLabel displayText={contentListTitle} />
         {contentListRating === 'NOT_SAFE_FOR_WORK' ? <NsfwLabel /> : null}
       </div>
-      <TextLabel displayText={contentListCurator.username} />
+      <TextLabel displayText={contentListAuthor.username} />
     </div>
   )
 }

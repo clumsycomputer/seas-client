@@ -1,9 +1,9 @@
 import { UserAccount } from './UserAccount'
 
 export interface ContentList {
-  contentListId: string
+  id: string
   contentListTitle: string
-  contentListCurator: UserAccount
+  contentListAuthor: UserAccount
   contentListRating: ContentListRating
   contentListItems: Array<ContentItem>
 }

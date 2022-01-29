@@ -13,7 +13,7 @@ function App() {
     <Routes>
       <Route path={'/'} element={<LandingPage />} />
       <Route path={'/sign-in'} element={<SignInPage />} />
-      <Route path={'/user/:userAccountId'} element={<UserProfilePage />} />
+      <Route path={'/user/:userId'} element={<UserProfilePage />} />
       <Route
         path={'/content-list/create'}
         element={<CreateContentListPage />}

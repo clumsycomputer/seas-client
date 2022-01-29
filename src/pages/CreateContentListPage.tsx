@@ -43,10 +43,10 @@ export function CreateContentListPage() {
               .then((createContentListResponse) =>
                 createContentListResponse.json()
               )
-              .then((createContentListResponseData: any) => {
-                navigateSite(
-                  `../content-list/${createContentListResponseData.id}`
-                )
+              .then((createContentListResponseData: unknown) => {
+                const createdContentListData =
+                  createContentListResponseData as ContentList
+                navigateSite(`../content-list/${createdContentListData.id}`)
               })
           },
         },

@@ -1,6 +1,11 @@
 import { ContentList } from './ContentList'
 
 export interface UserAccount {
-  userAccountId: string
+  id: string
   username: string
+  contentLists: Array<{
+    id: ContentList['id']
+    contentListTitle: ContentList['contentListTitle']
+    contentListRating: ContentList['contentListRating']
+  }>
 }
