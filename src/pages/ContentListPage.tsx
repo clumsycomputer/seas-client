@@ -24,9 +24,9 @@ export function ContentListPage(props: ContentListPageProps) {
           return (
             <ContentListItem
               key={`${someContentItemIndex}`}
-              contentTitle={someContentItem.contentTitle}
-              contentAuthor={someContentItem.contentAuthor}
-              contentLink={someContentItem.contentLink}
+              contentItemTitle={someContentItem.contentItemTitle}
+              contentItemAuthor={someContentItem.contentItemAuthor}
+              contentItemLinks={someContentItem.contentItemLinks}
             />
           )
         }
@@ -62,7 +62,7 @@ function ContentListHeader(props: ContentListHeaderProps) {
     <div className={styles.headerContainer}>
       <div className={styles.topRowContainer}>
         <TextLabel displayText={contentListTitle} />
-        {contentListRating === 'notSafeForWork' ? <NsfwLabel /> : null}
+        {contentListRating === 'NOT_SAFE_FOR_WORK' ? <NsfwLabel /> : null}
       </div>
       <TextLabel displayText={contentListCurator.username} />
     </div>
@@ -83,20 +83,23 @@ const useContentListHeaderStyles = createUseStyles((theme: AppTheme) => {
 })
 
 interface ContentListItemProps
-  extends Pick<ContentItem, 'contentTitle' | 'contentAuthor' | 'contentLink'> {}
+  extends Pick<
+    ContentItem,
+    'contentItemTitle' | 'contentItemAuthor' | 'contentItemLinks'
+  > {}
 
 function ContentListItem(props: ContentListItemProps) {
-  const { contentTitle, contentAuthor, contentLink } = props
+  const { contentItemTitle, contentItemAuthor, contentItemLinks } = props
   const styles = useContentItemStyles()
   return (
     <div className={styles.itemContainer}>
       <div className={styles.itemDivider}></div>
-      <TextLabel displayText={contentTitle} />
-      <TextLabel displayText={contentAuthor} />
+      <TextLabel displayText={contentItemTitle} />
+      <TextLabel displayText={contentItemAuthor} />
       <div className={styles.linksContainer}>
         <LinkLabel
-          displayText={contentLink.contentHostName}
-          linkHref={contentLink.contentHref}
+          displayText={contentItemLinks[0].contentLinkHostName}
+          linkHref={contentItemLinks[0].contentLinkUrl}
         />
       </div>
     </div>

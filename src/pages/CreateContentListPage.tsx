@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ContentListFormPage } from '../components/ContentListFormPage'
 import { ContentList } from '../models/ContentList'
 
@@ -10,9 +11,10 @@ export function CreateContentListPage() {
     >
   >({
     contentListTitle: '',
-    contentListRating: 'safeForWork',
+    contentListRating: 'SAFE_FOR_WORK',
     contentListItems: [],
   })
+  const navigateSite = useNavigate()
   return (
     <ContentListFormPage
       formTitle={'Create List'}
@@ -22,7 +24,31 @@ export function CreateContentListPage() {
         {
           disabled: false,
           buttonLabel: '✓ Publish List',
-          onClick: () => {},
+          onClick: () => {
+            fetch(`http://localhost:8000/content-list/`, {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: `Token ${window.localStorage.getItem(
+                  'auth-token'
+                )}`,
+              },
+              body: JSON.stringify({
+                contentListTitle: formState.contentListTitle,
+                contentListRating: formState.contentListRating,
+                contentListItems: formState.contentListItems,
+              }),
+            })
+              .then((createContentListResponse) =>
+                createContentListResponse.json()
+              )
+              .then((createContentListResponseData: any) => {
+                navigateSite(
+                  `../content-list/${createContentListResponseData.id}`
+                )
+              })
+          },
         },
         {
           disabled: false,

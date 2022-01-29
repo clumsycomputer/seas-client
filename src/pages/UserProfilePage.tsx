@@ -29,7 +29,7 @@ export function UserProfilePage(props: UserProfilePageProps) {
             <div className={styles.contentListHeaderRow}>
               <div className={styles.contentListTitleContainer}>
                 <TextLabel displayText={someContentList.contentListTitle} />
-                {someContentList.contentListRating === 'notSafeForWork' ? (
+                {someContentList.contentListRating === 'NOT_SAFE_FOR_WORK' ? (
                   <NsfwLabel />
                 ) : null}
               </div>

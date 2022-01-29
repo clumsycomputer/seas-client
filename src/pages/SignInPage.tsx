@@ -36,7 +36,21 @@ export function SignInPage() {
         disabled={false}
         buttonLabel={'Sign In'}
         onClick={() => {
-          fetch('')
+          fetch(`http://localhost:8000/rest-auth/login/`, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: formState.email,
+              password: formState.password,
+            }),
+          })
+            .then((loginResponse) => loginResponse.json())
+            .then((loginResponseData: any) => {
+              window.localStorage.setItem('auth-token', loginResponseData.key)
+            })
         }}
       />
     </PageContainer>

@@ -16,138 +16,138 @@ export const appData: {
     },
   },
   contentLists: {
-    aaa: {
-      contentListId: 'aaa',
-      contentListTitle: 'electronic music #1',
-      contentListRating: 'notSafeForWork',
-      contentListCurator: {
-        userAccountId: 'aaa',
-        username: 'jmath',
-      },
-      contentListItems: [
-        {
-          contentTitle: 'Los Angeles',
-          contentAuthor: 'Totally Enormous Extinct Dinosaurs',
-          contentLink: {
-            contentHostName: 'youtube',
-            contentHref: 'todo',
-          },
-        },
-        {
-          contentTitle: 'Das Wort',
-          contentAuthor: 'DJ Koze',
-          contentLink: {
-            contentHostName: 'youtube',
-            contentHref: 'todo',
-          },
-        },
-        {
-          contentTitle: 'Sooner',
-          contentAuthor: 'WhoMadeWho',
-          contentLink: {
-            contentHostName: 'youtube',
-            contentHref: 'https://youtu.be/UnJ8h5BKwQs',
-          },
-          // contentLinks: [
-          // {
-          //   contentHostName: 'youtube',
-          //   contentHref: 'https://youtu.be/UnJ8h5BKwQs',
-          // },
-          //   {
-          //     contentHostName: 'spotify',
-          //     contentHref:
-          //       'https://open.spotify.com/track/4764iXim5VO3mVjHFcuj3b?si=0d673f3dfbf844d2',
-          //   },
-          // ],
-        },
-        {
-          contentTitle: 'All I Ever Need',
-          contentAuthor: 'Caribou',
-          contentLink: {
-            contentHostName: 'youtube',
-            contentHref: 'https://youtu.be/PFcdXvJIfSM',
-          },
-        },
-        {
-          contentTitle: 'Love Divide',
-          contentAuthor: 'Ross From Friends',
-          contentLink: {
-            contentHostName: 'youtube',
-            contentHref: 'todo',
-          },
-        },
-        {
-          contentTitle: 'Such A Bad Way',
-          contentAuthor: 'Against All Logic',
-          contentLink: {
-            contentHostName: 'youtube',
-            contentHref: 'https://youtu.be/aSgezZ4fC1Y',
-          },
-        },
-        {
-          contentTitle: 'Turn It All Down',
-          contentAuthor: 'Bibio',
-          contentLink: {
-            contentHostName: 'youtube',
-            contentHref: 'https://youtu.be/g7vwM8p2XBE',
-          },
-        },
-        {
-          contentTitle: 'Hustler',
-          contentAuthor: 'Simian Mobile Disco',
-          contentLink: {
-            contentHostName: 'youtube',
-            contentHref: 'todo',
-          },
-        },
-        {
-          contentTitle: 'Topdown',
-          contentAuthor: 'Channel Tres',
-          contentLink: {
-            contentHostName: 'youtube',
-            contentHref: 'https://youtu.be/8pReEUxHxJM',
-          },
-        },
-        {
-          contentTitle: 'Let U No',
-          contentAuthor: 'Dj Rashad',
-          contentLink: {
-            contentHostName: 'youtube',
-            contentHref: 'todo',
-          },
-        },
-        // {
-        //   contentId: '3',
-        //   contentTitle: 'Love Just Died Tonight',
-        //   contentAuthor: 'Bastien Keb',
-        //   contentLinks: [
-        //     {
-        //       contentHostName: 'youtube',
-        //       contentHref: 'todo',
-        //     },
-        //     {
-        //       contentHostName: 'spotify',
-        //       contentHref: 'todo',
-        //     },
-        //   ],
-        // },
-        // {
-        //   contentId: '2',
-        //   contentTitle: 'The Son of the Sun',
-        //   contentAuthor: 'The 2 Bears',
-        //   contentLinks: [
-        //     {
-        //       contentHostName: 'youtube',
-        //       contentHref: 'https://youtu.be/2jEf5FZyjVE',
-        //     },
-        //     {
-        //       contentHostName: 'spotify',
-        //       contentHref:
-        //         'https://open.spotify.com/track/7300apJrwWCARQaJBRnBLi?si=0e0acfde527c4be2',
-        //     },
-        //   ],
-        // },
-      ],
-    },
+    // aaa: {
+    //   contentListId: 'aaa',
+    //   contentListTitle: 'electronic music #1',
+    //   contentListRating: 'NOT_SAFE_FOR_WORK',
+    //   contentListCurator: {
+    //     userAccountId: 'aaa',
+    //     username: 'jmath',
+    //   },
+    //   contentListItems: [
+    //     {
+    //       contentItemTitle: 'Los Angeles',
+    //       contentItemAuthor: 'Totally Enormous Extinct Dinosaurs',
+    //       contentItemLinks: {
+    //         contentHostName: 'youtube',
+    //         contentHref: 'todo',
+    //       },
+    //     },
+    //     {
+    //       contentItemTitle: 'Das Wort',
+    //       contentItemAuthor: 'DJ Koze',
+    //       contentItemLinks: {
+    //         contentHostName: 'youtube',
+    //         contentHref: 'todo',
+    //       },
+    //     },
+    //     {
+    //       contentItemTitle: 'Sooner',
+    //       contentItemAuthor: 'WhoMadeWho',
+    //       contentItemLinks: {
+    //         contentHostName: 'youtube',
+    //         contentHref: 'https://youtu.be/UnJ8h5BKwQs',
+    //       },
+    //       // contentItemLinkss: [
+    //       // {
+    //       //   contentHostName: 'youtube',
+    //       //   contentHref: 'https://youtu.be/UnJ8h5BKwQs',
+    //       // },
+    //       //   {
+    //       //     contentHostName: 'spotify',
+    //       //     contentHref:
+    //       //       'https://open.spotify.com/track/4764iXim5VO3mVjHFcuj3b?si=0d673f3dfbf844d2',
+    //       //   },
+    //       // ],
+    //     },
+    //     {
+    //       contentItemTitle: 'All I Ever Need',
+    //       contentItemAuthor: 'Caribou',
+    //       contentItemLinks: {
+    //         contentHostName: 'youtube',
+    //         contentHref: 'https://youtu.be/PFcdXvJIfSM',
+    //       },
+    //     },
+    //     {
+    //       contentItemTitle: 'Love Divide',
+    //       contentItemAuthor: 'Ross From Friends',
+    //       contentItemLinks: {
+    //         contentHostName: 'youtube',
+    //         contentHref: 'todo',
+    //       },
+    //     },
+    //     {
+    //       contentItemTitle: 'Such A Bad Way',
+    //       contentItemAuthor: 'Against All Logic',
+    //       contentItemLinks: {
+    //         contentHostName: 'youtube',
+    //         contentHref: 'https://youtu.be/aSgezZ4fC1Y',
+    //       },
+    //     },
+    //     {
+    //       contentItemTitle: 'Turn It All Down',
+    //       contentItemAuthor: 'Bibio',
+    //       contentItemLinks: {
+    //         contentHostName: 'youtube',
+    //         contentHref: 'https://youtu.be/g7vwM8p2XBE',
+    //       },
+    //     },
+    //     {
+    //       contentItemTitle: 'Hustler',
+    //       contentItemAuthor: 'Simian Mobile Disco',
+    //       contentItemLinks: {
+    //         contentHostName: 'youtube',
+    //         contentHref: 'todo',
+    //       },
+    //     },
+    //     {
+    //       contentItemTitle: 'Topdown',
+    //       contentItemAuthor: 'Channel Tres',
+    //       contentItemLinks: {
+    //         contentHostName: 'youtube',
+    //         contentHref: 'https://youtu.be/8pReEUxHxJM',
+    //       },
+    //     },
+    //     {
+    //       contentItemTitle: 'Let U No',
+    //       contentItemAuthor: 'Dj Rashad',
+    //       contentItemLinks: {
+    //         contentHostName: 'youtube',
+    //         contentHref: 'todo',
+    //       },
+    //     },
+    //     // {
+    //     //   contentId: '3',
+    //     //   contentTitle: 'Love Just Died Tonight',
+    //     //   contentItemAuthor: 'Bastien Keb',
+    //     //   contentItemLinkss: [
+    //     //     {
+    //     //       contentHostName: 'youtube',
+    //     //       contentHref: 'todo',
+    //     //     },
+    //     //     {
+    //     //       contentHostName: 'spotify',
+    //     //       contentHref: 'todo',
+    //     //     },
+    //     //   ],
+    //     // },
+    //     // {
+    //     //   contentId: '2',
+    //     //   contentTitle: 'The Son of the Sun',
+    //     //   contentItemAuthor: 'The 2 Bears',
+    //     //   contentItemLinkss: [
+    //     //     {
+    //     //       contentHostName: 'youtube',
+    //     //       contentHref: 'https://youtu.be/2jEf5FZyjVE',
+    //     //     },
+    //     //     {
+    //     //       contentHostName: 'spotify',
+    //     //       contentHref:
+    //     //         'https://open.spotify.com/track/7300apJrwWCARQaJBRnBLi?si=0e0acfde527c4be2',
+    //     //     },
+    //     //   ],
+    //     // },
+    //   ],
+    // },
   },
 }

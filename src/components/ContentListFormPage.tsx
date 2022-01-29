@@ -43,14 +43,14 @@ export function ContentListFormPage(props: ContentListFormPageProps) {
           />
           <CheckboxField
             fieldLabel={'Nsfw:'}
-            checked={formState.contentListRating === 'notSafeForWork'}
+            checked={formState.contentListRating === 'NOT_SAFE_FOR_WORK'}
             onChange={(someChangeEvent) => {
               setFormState({
                 ...formState,
                 contentListRating:
                   someChangeEvent.target.checked === true
-                    ? 'notSafeForWork'
-                    : 'safeForWork',
+                    ? 'NOT_SAFE_FOR_WORK'
+                    : 'SAFE_FOR_WORK',
               })
             }}
           />
@@ -63,14 +63,14 @@ export function ContentListFormPage(props: ContentListFormPageProps) {
                 <div className={styles.contentItemFieldsContainer}>
                   <TextField
                     fieldLabel={'Content Title:'}
-                    value={someContentItem.contentTitle}
+                    value={someContentItem.contentItemTitle}
                     onChange={(someChangeEvent) => {
                       const nextContentListItems = [
                         ...formState.contentListItems,
                       ]
                       nextContentListItems.splice(contentItemIndex, 1, {
                         ...someContentItem,
-                        contentTitle: someChangeEvent.target.value,
+                        contentItemTitle: someChangeEvent.target.value,
                       })
                       setFormState({
                         ...formState,
@@ -80,14 +80,14 @@ export function ContentListFormPage(props: ContentListFormPageProps) {
                   />
                   <TextField
                     fieldLabel={'Content Author:'}
-                    value={someContentItem.contentAuthor}
+                    value={someContentItem.contentItemAuthor}
                     onChange={(someChangeEvent) => {
                       const nextContentListItems = [
                         ...formState.contentListItems,
                       ]
                       nextContentListItems.splice(contentItemIndex, 1, {
                         ...someContentItem,
-                        contentAuthor: someChangeEvent.target.value,
+                        contentItemAuthor: someChangeEvent.target.value,
                       })
                       setFormState({
                         ...formState,
@@ -97,17 +97,21 @@ export function ContentListFormPage(props: ContentListFormPageProps) {
                   />
                   <TextField
                     fieldLabel={'Content Host:'}
-                    value={someContentItem.contentLink.contentHostName}
+                    value={
+                      someContentItem.contentItemLinks[0].contentLinkHostName
+                    }
                     onChange={(someChangeEvent) => {
                       const nextContentListItems = [
                         ...formState.contentListItems,
                       ]
                       nextContentListItems.splice(contentItemIndex, 1, {
                         ...someContentItem,
-                        contentLink: {
-                          ...someContentItem.contentLink,
-                          contentHostName: someChangeEvent.target.value,
-                        },
+                        contentItemLinks: [
+                          {
+                            ...someContentItem.contentItemLinks[0],
+                            contentLinkHostName: someChangeEvent.target.value,
+                          },
+                        ],
                       })
                       setFormState({
                         ...formState,
@@ -117,17 +121,19 @@ export function ContentListFormPage(props: ContentListFormPageProps) {
                   />
                   <TextField
                     fieldLabel={'Content Url:'}
-                    value={someContentItem.contentLink.contentHref}
+                    value={someContentItem.contentItemLinks[0].contentLinkUrl}
                     onChange={(someChangeEvent) => {
                       const nextContentListItems = [
                         ...formState.contentListItems,
                       ]
                       nextContentListItems.splice(contentItemIndex, 1, {
                         ...someContentItem,
-                        contentLink: {
-                          ...someContentItem.contentLink,
-                          contentHref: someChangeEvent.target.value,
-                        },
+                        contentItemLinks: [
+                          {
+                            ...someContentItem.contentItemLinks[0],
+                            contentLinkUrl: someChangeEvent.target.value,
+                          },
+                        ],
                       })
                       setFormState({
                         ...formState,
@@ -204,12 +210,14 @@ export function ContentListFormPage(props: ContentListFormPageProps) {
                 contentListItems: [
                   ...formState.contentListItems,
                   {
-                    contentTitle: '',
-                    contentAuthor: '',
-                    contentLink: {
-                      contentHostName: '',
-                      contentHref: '',
-                    },
+                    contentItemTitle: '',
+                    contentItemAuthor: '',
+                    contentItemLinks: [
+                      {
+                        contentLinkHostName: '',
+                        contentLinkUrl: '',
+                      },
+                    ],
                   },
                 ],
               })

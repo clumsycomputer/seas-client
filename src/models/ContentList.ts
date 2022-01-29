@@ -8,13 +8,15 @@ export interface ContentList {
   contentListItems: Array<ContentItem>
 }
 
-export type ContentListRating = 'safeForWork' | 'notSafeForWork'
+export type ContentListRating = 'SAFE_FOR_WORK' | 'NOT_SAFE_FOR_WORK'
 
 export interface ContentItem {
-  contentTitle: string
-  contentAuthor: string
-  contentLink: {
-    contentHostName: string
-    contentHref: string
-  }
+  contentItemTitle: string
+  contentItemAuthor: string
+  contentItemLinks: Array<ContentLink>
+}
+
+export interface ContentLink {
+  contentLinkHostName: string
+  contentLinkUrl: string
 }
