@@ -17,7 +17,7 @@ export function ContentListPage(props: ContentListPageProps) {
     <div>Loading...</div>
   )
   useEffect(() => {
-    fetch(`http://localhost:8000/content-list/${routeParams.contentListId}`)
+    fetch(`http://localhost:8000/content-lists/${routeParams.contentListId}`)
       .then((getContentListResponse) => getContentListResponse.json())
       .then((contentListResponseData: unknown) => {
         const contentList = contentListResponseData as ContentList

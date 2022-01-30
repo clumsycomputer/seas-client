@@ -1,9 +1,11 @@
 import { Fragment, ReactNode, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ContentListFormPage } from '../components/ContentListFormPage'
+import { useCurrentUser } from '../hooks/useCurrentUser'
 import { ContentList } from '../models/ContentList'
 
 export function EditContentListPage() {
+  const currentUser = useCurrentUser()
   const routeParams = useParams()
   const navigateSite = useNavigate()
   const [formState, setFormState] = useState<Pick<
@@ -14,7 +16,7 @@ export function EditContentListPage() {
     <div>Loading...</div>
   )
   useEffect(() => {
-    fetch(`http://localhost:8000/content-list/${routeParams.contentListId}`)
+    fetch(`http://localhost:8000/content-lists/${routeParams.contentListId}`)
       .then((getContentListResponse) => getContentListResponse.json())
       .then((contentListResponseData: unknown) => {
         const contentList = contentListResponseData as ContentList
@@ -34,15 +36,13 @@ export function EditContentListPage() {
               buttonLabel: '✓ Update List',
               onClick: () => {
                 fetch(
-                  `http://localhost:8000/content-list/${routeParams.contentListId}/`,
+                  `http://localhost:8000/content-lists/${routeParams.contentListId}/`,
                   {
                     method: 'PUT',
                     headers: {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
-                      Authorization: `Token ${window.localStorage.getItem(
-                        'auth-token'
-                      )}`,
+                      Authorization: `Token ${currentUser?.authToken}`,
                     },
                     body: JSON.stringify({
                       contentListTitle: formState.contentListTitle,
@@ -57,7 +57,7 @@ export function EditContentListPage() {
                   .then((editContentListResponseData: unknown) => {
                     const updatedContentListData =
                       editContentListResponseData as ContentList
-                    navigateSite(`../content-list/${updatedContentListData.id}`)
+                    navigateSite(`/content-list/${updatedContentListData.id}`)
                   })
               },
             },
@@ -66,26 +66,26 @@ export function EditContentListPage() {
               buttonLabel: '- Delete List',
               onClick: () => {
                 fetch(
-                  `http://localhost:8000/content-list/${routeParams.contentListId}/`,
+                  `http://localhost:8000/content-lists/${routeParams.contentListId}/`,
                   {
                     method: 'DELETE',
                     headers: {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
-                      Authorization: `Token ${window.localStorage.getItem(
-                        'auth-token'
-                      )}`,
+                      Authorization: `Token ${currentUser?.authToken}`,
                     },
                   }
                 ).then(() => {
-                  navigateSite(`/`)
+                  navigateSite(`/user/${currentUser?.id}`)
                 })
               },
             },
             {
               disabled: false,
               buttonLabel: '✕ Cancel',
-              onClick: () => {},
+              onClick: () => {
+                navigateSite(`/content-list/${routeParams.contentListId}`)
+              },
             },
           ]}
         />

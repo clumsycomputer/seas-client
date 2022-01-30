@@ -6,21 +6,23 @@ import { LinkLabel } from '../components/LinkLabel'
 import { NsfwLabel } from '../components/NsfwLabel'
 import { PageContainer } from '../components/PageContainer'
 import { TextLabel } from '../components/TextLabel'
-import { UserAccount } from '../models/UserAccount'
+import { useCurrentUser } from '../hooks/useCurrentUser'
+import { UserProfile } from '../models/User'
 
 export interface UserProfilePageProps {}
 
 export function UserProfilePage(props: UserProfilePageProps) {
+  const currentUser = useCurrentUser()
   const styles = useStyles()
   const routeParams = useParams()
   const [pageContent, setPageContent] = useState<ReactNode>(
     <div>Loading...</div>
   )
   useEffect(() => {
-    fetch(`http://localhost:8000/user/${routeParams.userId}`)
+    fetch(`http://localhost:8000/users/${routeParams.userId}`)
       .then((getUserResponse) => getUserResponse.json())
       .then((userResponseData: unknown) => {
-        const userAccount = userResponseData as UserAccount
+        const userAccount = userResponseData as UserProfile
         setPageContent(
           <Fragment>
             <TextLabel displayText={userAccount.username} />

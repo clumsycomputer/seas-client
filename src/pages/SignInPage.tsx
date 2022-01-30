@@ -1,10 +1,13 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ActionButton } from '../components/ActionButton'
 import { PageContainer } from '../components/PageContainer'
 import { PageHeader } from '../components/PageHeader'
 import { TextField } from '../components/TextField'
+import { CurrentUser } from '../models/User'
 
 export function SignInPage() {
+  const navigateSite = useNavigate()
   const [formState, setFormState] = useState({
     email: '',
     password: '',
@@ -48,8 +51,27 @@ export function SignInPage() {
             }),
           })
             .then((loginResponse) => loginResponse.json())
-            .then((loginResponseData: any) => {
-              window.localStorage.setItem('auth-token', loginResponseData.key)
+            .then((loginResponseData: unknown) => {
+              const authToken = (loginResponseData as { key: string }).key
+              return fetch('http://localhost:8000/current-user', {
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                  Authorization: `Token ${authToken}`,
+                },
+              })
+                .then((currentUserResponse) => currentUserResponse.json())
+                .then((currentUserData: unknown) => {
+                  const currentUser = currentUserData as CurrentUser
+                  window.localStorage.setItem(
+                    'currentUser',
+                    JSON.stringify({
+                      ...currentUser,
+                      authToken,
+                    })
+                  )
+                  navigateSite(`/user/${currentUser.id}`)
+                })
             })
         }}
       />

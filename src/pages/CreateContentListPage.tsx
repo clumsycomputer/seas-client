@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ContentListFormPage } from '../components/ContentListFormPage'
+import { useCurrentUser } from '../hooks/useCurrentUser'
 import { ContentList } from '../models/ContentList'
 
 export function CreateContentListPage() {
+  const currentUser = useCurrentUser()
   const [formState, setFormState] = useState<
     Pick<
       ContentList,
@@ -25,14 +27,12 @@ export function CreateContentListPage() {
           disabled: false,
           buttonLabel: '✓ Publish List',
           onClick: () => {
-            fetch(`http://localhost:8000/content-list/`, {
+            fetch(`http://localhost:8000/content-lists/`, {
               method: 'POST',
               headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-                Authorization: `Token ${window.localStorage.getItem(
-                  'auth-token'
-                )}`,
+                Authorization: `Token ${currentUser?.authToken}`,
               },
               body: JSON.stringify({
                 contentListTitle: formState.contentListTitle,
@@ -46,14 +46,16 @@ export function CreateContentListPage() {
               .then((createContentListResponseData: unknown) => {
                 const createdContentListData =
                   createContentListResponseData as ContentList
-                navigateSite(`../content-list/${createdContentListData.id}`)
+                navigateSite(`/content-list/${createdContentListData.id}`)
               })
           },
         },
         {
           disabled: false,
           buttonLabel: '✕ Cancel',
-          onClick: () => {},
+          onClick: () => {
+            navigateSite(`/user/${currentUser?.id}`)
+          },
         },
       ]}
     />

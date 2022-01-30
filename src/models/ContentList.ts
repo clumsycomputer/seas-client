@@ -1,9 +1,9 @@
-import { UserAccount } from './UserAccount'
+import { User } from './User'
 
 export interface ContentList {
   id: string
   contentListTitle: string
-  contentListAuthor: UserAccount
+  contentListAuthor: User
   contentListRating: ContentListRating
   contentListItems: Array<ContentItem>
 }
