@@ -1,16 +1,9 @@
 import { AccountCircle } from '@mui/icons-material'
-import {
-  AppBar,
-  Button,
-  IconButton,
-  Menu,
-  MenuItem,
-  Toolbar,
-  Typography,
-} from '@mui/material'
-import { Fragment, ReactNode, useState } from 'react'
+import { AppBar, Button, MenuItem, Toolbar, Typography } from '@mui/material'
+import { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CurrentUser } from '../models/User'
+import { MenuButton } from './MenuButton'
 
 export interface PageProps {
   currentUserButton: ReactNode
@@ -63,47 +56,27 @@ export interface LoggedInUserPageProps extends Pick<PageProps, 'pageBody'> {
 export function LoggedInUserPage(props: LoggedInUserPageProps) {
   const { pageBody, currentUser } = props
   const navigateToPage = useNavigate()
-  const [currentUserMenuAnchor, setCurrentUserMenuAnchor] =
-    useState<HTMLElement | null>(null)
   return (
     <Page
       pageBody={pageBody}
       currentUserButton={
-        <Fragment>
-          <IconButton
-            color={'inherit'}
-            onClick={(clickEvent) => {
-              setCurrentUserMenuAnchor(clickEvent.currentTarget)
-            }}
-          >
-            <AccountCircle />
-          </IconButton>
-          <Menu
-            keepMounted={true}
-            anchorEl={currentUserMenuAnchor}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            open={Boolean(currentUserMenuAnchor)}
-            onClose={() => {
-              setCurrentUserMenuAnchor(null)
-            }}
-          >
+        <MenuButton
+          buttonColor={'inherit'}
+          buttonIcon={<AccountCircle />}
+          menuItems={[
             <MenuItem
+              key={'profile-item'}
               onClick={() => {
                 navigateToPage(`/${currentUser.id}`)
               }}
             >
               Profile
-            </MenuItem>
-            <MenuItem onClick={() => {}}>Sign Out</MenuItem>
-          </Menu>
-        </Fragment>
+            </MenuItem>,
+            <MenuItem key={'sign-out-item'} onClick={() => {}}>
+              Sign Out
+            </MenuItem>,
+          ]}
+        />
       }
     />
   )

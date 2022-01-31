@@ -1,23 +1,18 @@
-import {
-  AddRounded,
-  DeleteRounded,
-  EditRounded,
-  MoreVert,
-} from '@mui/icons-material'
+import { AddRounded, MoreVert } from '@mui/icons-material'
 import {
   Box,
-  Button,
   Divider,
   IconButton,
   Link,
   List,
   ListItem,
-  ListItemText,
+  MenuItem,
   Stack,
   Typography,
 } from '@mui/material'
 import { ReactNode, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { MenuButton } from '../components/MenuButton'
 import { LoggedInUserPage, LoggedOutUserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { UserProfile } from '../models/User'
@@ -31,6 +26,7 @@ export function UserProfilePage() {
       .then((getUserProfileResponse) => getUserProfileResponse.json())
       .then((userProfileData: unknown) => {
         const userProfile = userProfileData as UserProfile
+        const currentUserCanEditProfile = currentUser?.id === userProfile.id
         setPageBody(
           <Stack padding={1}>
             <Box display={'flex'} flexDirection={'row'} alignItems={'center'}>
@@ -41,9 +37,13 @@ export function UserProfilePage() {
               </Box>
               <Box flexGrow={1} />
               <Box padding={1} paddingRight={2} display={'flex'}>
-                <IconButton>
-                  <AddRounded />
-                </IconButton>
+                <Box
+                  visibility={currentUserCanEditProfile ? 'visible' : 'hidden'}
+                >
+                  <IconButton>
+                    <AddRounded />
+                  </IconButton>
+                </Box>
               </Box>
             </Box>
             <Divider />
@@ -54,9 +54,24 @@ export function UserProfilePage() {
                     <ListItem
                       key={`${contentListIndex}`}
                       secondaryAction={
-                        <IconButton size={'small'}>
-                          <MoreVert />
-                        </IconButton>
+                        <Box
+                          visibility={
+                            currentUserCanEditProfile ? 'visible' : 'hidden'
+                          }
+                        >
+                          <MenuButton
+                            buttonColor={'default'}
+                            buttonIcon={<MoreVert />}
+                            menuItems={[
+                              <MenuItem key={'edit-list-item'}>
+                                Edit List
+                              </MenuItem>,
+                              <MenuItem key={'delete-list-item'}>
+                                Delete List
+                              </MenuItem>,
+                            ]}
+                          />
+                        </Box>
                       }
                     >
                       <Box
@@ -89,118 +104,10 @@ export function UserProfilePage() {
           </Stack>
         )
       })
-  }, [])
+  }, [routeParams.userId])
   return currentUser === null ? (
     <LoggedOutUserPage pageBody={pageBody} />
   ) : (
     <LoggedInUserPage currentUser={currentUser} pageBody={pageBody} />
   )
 }
-// import { Fragment, ReactNode, useEffect, useState } from 'react'
-// import { useNavigate, useParams } from 'react-router-dom'
-// import { ActionButton } from '../components/ActionButton'
-// import { LinkLabel } from '../components/LinkLabel'
-// import { NsfwLabel } from '../components/NsfwLabel'
-// import { PageContainer } from '../components/PageContainer'
-// import { TextLabel } from '../components/TextLabel'
-// import { useCurrentUser } from '../hooks/useCurrentUser'
-// import { UserProfile } from '../models/User'
-
-// export interface UserProfilePageProps {}
-
-// export function UserProfilePage(props: UserProfilePageProps) {
-//   const currentUser = useCurrentUser()
-//   // const styles = useStyles()
-//   const routeParams = useParams()
-//   const navigateToPage = useNavigate()
-//   const [pageContent, setPageContent] = useState<ReactNode>(
-//     <div>Loading...</div>
-//   )
-//   useEffect(() => {
-// fetch(`http://localhost:8000/users/${routeParams.userId}`)
-//   .then((getUserProfileResponse) => getUserProfileResponse.json())
-//   .then((userProfileData: unknown) => {
-//     const userProfile = userProfileData as UserProfile
-//     const currentUserOwnsProfile = currentUser?.id === userProfile.id
-//     setPageContent(
-//       <Fragment>
-//         <TextLabel displayText={userProfile.username} />
-//         {currentUserOwnsProfile ? (
-//           <ActionButton
-//             disabled={false}
-//             buttonLabel={'create list'}
-//             onClick={() => {
-//               navigateToPage('/content-list/create')
-//             }}
-//           />
-//         ) : null}
-//         {userProfile.contentLists.map((someContentList) => {
-//           return (
-//             <div
-//               key={`${someContentList.id}`}
-//               // className={styles.contentListItemContainer}
-//             >
-//               <div
-//               // className={styles.contentListItemDivider}
-//               />
-//               <div
-//               // className={styles.contentListHeaderRow}
-//               >
-//                 <div
-//                 // className={styles.contentListTitleContainer}
-//                 >
-//                   <TextLabel
-//                     displayText={someContentList.contentListTitle}
-//                   />
-//                   {someContentList.contentListRating ===
-//                   'NOT_SAFE_FOR_WORK' ? (
-//                     <NsfwLabel />
-//                   ) : null}
-//                 </div>
-//                 <div
-//                 // className={styles.viewListActionContainer}
-//                 >
-//                   <LinkLabel
-//                     displayText={'view list'}
-//                     linkHref={`/content-list/${someContentList.id}`}
-//                   />
-//                 </div>
-//               </div>
-//             </div>
-//           )
-//         })}
-//       </Fragment>
-//     )
-//       })
-//   }, [])
-//   return <PageContainer>{pageContent}</PageContainer>
-// }
-
-// // const useStyles = makeStyles((appTheme: Theme) => {
-// //   return createStyles({
-// //     contentListItemContainer: {
-// //       width: '100%',
-// //       paddingTop: appTheme.spacing(2),
-// //       display: 'flex',
-// //       flexDirection: 'column',
-// //     },
-// //     contentListHeaderRow: {
-// //       display: 'flex',
-// //       flexDirection: 'row',
-// //     },
-// //     contentListTitleContainer: {
-// //       flexGrow: 1,
-// //       display: 'flex',
-// //       flexDirection: 'row',
-// //     },
-// //     contentListItemDivider: {
-// //       height: 2,
-// //       backgroundColor: appTheme.palette.divider,
-// //       borderRadius: 2,
-// //     },
-// //     viewListActionContainer: {
-// //       paddingLeft: appTheme.spacing(1),
-// //       paddingRight: appTheme.spacing(1),
-// //     },
-// //   })
-// // })
