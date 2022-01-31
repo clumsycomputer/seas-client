@@ -35,7 +35,7 @@ export function UserProfilePage() {
           <Stack padding={1}>
             <Box display={'flex'} flexDirection={'row'} alignItems={'center'}>
               <Box padding={1} display={'flex'}>
-                <Typography variant={'subtitle2'} padding={1 / 2}>
+                <Typography variant={'subtitle2'} fontWeight={600}>
                   {userProfile.username}
                 </Typography>
               </Box>
@@ -48,40 +48,43 @@ export function UserProfilePage() {
             </Box>
             <Divider />
             <List>
-              {userProfile.contentLists.map((someContentList) => {
-                return (
-                  <ListItem
-                    // divider={true}
-                    secondaryAction={
-                      <IconButton>
-                        <MoreVert />
-                      </IconButton>
-                    }
-                  >
-                    <Box
-                      padding={1}
-                      paddingLeft={0}
-                      display={'flex'}
-                      flexDirection={'row'}
-                      flexWrap={'wrap'}
-                      alignItems={'baseline'}
+              {userProfile.contentLists.map(
+                (someContentList, contentListIndex) => {
+                  return (
+                    <ListItem
+                      key={`${contentListIndex}`}
+                      secondaryAction={
+                        <IconButton size={'small'}>
+                          <MoreVert />
+                        </IconButton>
+                      }
                     >
-                      <Link href={`/content-list/${someContentList.id}`}>
-                        <Typography variant={'body1'}>
-                          {someContentList.contentListTitle}
-                        </Typography>
-                      </Link>
-                      <Typography
-                        variant={'body2'}
-                        color={'error.main'}
-                        paddingLeft={1}
+                      <Box
+                        padding={1}
+                        paddingLeft={0}
+                        display={'flex'}
+                        flexDirection={'row'}
+                        flexWrap={'wrap'}
+                        alignItems={'baseline'}
                       >
-                        nsfw
-                      </Typography>
-                    </Box>
-                  </ListItem>
-                )
-              })}
+                        <Link href={`/content-list/${someContentList.id}`}>
+                          <Typography variant={'subtitle2'} fontWeight={600}>
+                            {someContentList.contentListTitle}
+                          </Typography>
+                        </Link>
+                        <Typography
+                          variant={'caption'}
+                          color={'error.main'}
+                          fontWeight={500}
+                          paddingLeft={1}
+                        >
+                          nsfw
+                        </Typography>
+                      </Box>
+                    </ListItem>
+                  )
+                }
+              )}
             </List>
           </Stack>
         )
