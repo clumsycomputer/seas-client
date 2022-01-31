@@ -1,15 +1,16 @@
-export interface AppTheme extends Jss.Theme {
-  spacing: (spacingScalar: number) => number
-  palette: {
-    lightGray: string
-    red: string
-  }
-}
+import { createTheme } from '@mui/material'
 
-export const appTheme: AppTheme = {
-  spacing: (spacingScalar) => spacingScalar * 8,
-  palette: {
-    lightGray: '#EEEEEE',
-    red: '#D32F2F',
-  },
+// export interface SeasTheme extends Jss.Theme {
+//   spacing: (spacingScalar: number) => number
+//   palette: {
+//     lightGray: string
+//     red: string
+//   }
+// }
+
+export const appTheme = createTheme({})
+
+declare module '@mui/material/styles' {
+  interface Theme {}
+  interface ThemeOptions {}
 }

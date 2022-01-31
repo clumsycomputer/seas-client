@@ -1,10 +1,11 @@
-import { PageContainer } from '../components/PageContainer'
-import { PageHeader } from '../components/PageHeader'
+import { LoggedInUserPage, LoggedOutUserPage } from '../components/Page'
+import { useCurrentUser } from '../hooks/useCurrentUser'
 
 export function LandingPage() {
-  return (
-    <PageContainer>
-      <PageHeader pageTitle={'seas.io'} />
-    </PageContainer>
+  const currentUser = useCurrentUser()
+  return currentUser === null ? (
+    <LoggedOutUserPage pageBody={null} />
+  ) : (
+    <LoggedInUserPage currentUser={currentUser} pageBody={null} />
   )
 }

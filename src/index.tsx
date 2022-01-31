@@ -1,17 +1,17 @@
+import { CssBaseline, ThemeProvider } from '@mui/material'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { ThemeProvider } from 'react-jss'
 import { BrowserRouter } from 'react-router-dom'
-import App from './App'
 import { appTheme } from './appTheme'
-import './index.css'
 import reportWebVitals from './reportWebVitals'
+import { SeasApp } from './SeasApp'
 
 ReactDOM.render(
   <React.StrictMode>
+    <CssBaseline />
     <ThemeProvider theme={appTheme}>
       <BrowserRouter>
-        <App />
+        <SeasApp />
       </BrowserRouter>
     </ThemeProvider>
   </React.StrictMode>,
