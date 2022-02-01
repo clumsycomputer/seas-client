@@ -1,6 +1,6 @@
 import { MoreVert } from '@mui/icons-material'
 import { IconButton, IconButtonProps, Menu } from '@mui/material'
-import { Fragment, ReactNode, useState } from 'react'
+import { Fragment, ReactNode, useRef, useState } from 'react'
 
 export interface MenuButtonProps {
   buttonColor: IconButtonProps['color']
@@ -10,13 +10,15 @@ export interface MenuButtonProps {
 
 export function MenuButton(props: MenuButtonProps) {
   const { buttonColor, buttonIcon, menuItems } = props
-  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
+  const [menuOpen, setMenuOpen] = useState<boolean>(false)
+  const buttonRef = useRef<HTMLButtonElement>(null)
   return (
     <Fragment>
       <IconButton
+        ref={buttonRef}
         color={buttonColor}
-        onClick={(clickEvent) => {
-          setMenuAnchor(clickEvent.currentTarget)
+        onClick={() => {
+          setMenuOpen(true)
         }}
       >
         {buttonIcon}
@@ -31,10 +33,10 @@ export function MenuButton(props: MenuButtonProps) {
           vertical: 'top',
           horizontal: 'right',
         }}
-        anchorEl={menuAnchor}
-        open={Boolean(menuAnchor)}
+        anchorEl={buttonRef.current}
+        open={menuOpen}
         onClose={() => {
-          setMenuAnchor(null)
+          setMenuOpen(false)
         }}
       >
         {menuItems}

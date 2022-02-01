@@ -16,94 +16,99 @@ import { MenuButton } from '../components/MenuButton'
 import { LoggedInUserPage, LoggedOutUserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { UserProfile } from '../models/User'
+import { getUserProfile } from '../services/SeasService'
 
 export function UserProfilePage() {
   const routeParams = useParams()
   const currentUser = useCurrentUser()
   const [pageBody, setPageBody] = useState<ReactNode>(null)
   useEffect(() => {
-    fetch(`http://localhost:8000/user-profiles/${routeParams.userId}`)
-      .then((getUserProfileResponse) => getUserProfileResponse.json())
-      .then((userProfileData: unknown) => {
-        const userProfile = userProfileData as UserProfile
-        const currentUserCanEditProfile = currentUser?.id === userProfile.id
-        setPageBody(
-          <Stack padding={1}>
-            <Box display={'flex'} flexDirection={'row'} alignItems={'center'}>
-              <Box padding={1} display={'flex'}>
-                <Typography variant={'subtitle2'} fontWeight={600}>
-                  {userProfile.username}
-                </Typography>
-              </Box>
-              <Box flexGrow={1} />
-              <Box padding={1} paddingRight={2} display={'flex'}>
-                <Box
-                  visibility={currentUserCanEditProfile ? 'visible' : 'hidden'}
+    getUserProfile({
+      userId: routeParams.userId!,
+    }).then((userProfileData: unknown) => {
+      const userProfile = userProfileData as UserProfile
+      const currentUserCanEditProfile = currentUser?.id === userProfile.id
+      setPageBody(
+        <Stack padding={1}>
+          <Box display={'flex'} flexDirection={'row'} alignItems={'center'}>
+            <Box padding={1} display={'flex'}>
+              <Typography variant={'subtitle2'} fontWeight={600}>
+                {userProfile.username}
+              </Typography>
+            </Box>
+            <Box flexGrow={1} />
+            <Box padding={1} paddingRight={2} display={'flex'}>
+              <Box
+                visibility={currentUserCanEditProfile ? 'visible' : 'hidden'}
+              >
+                <IconButton
+                  onClick={() => {
+                    // todo
+                  }}
                 >
-                  <IconButton>
-                    <AddRounded />
-                  </IconButton>
-                </Box>
+                  <AddRounded />
+                </IconButton>
               </Box>
             </Box>
-            <Divider />
-            <List>
-              {userProfile.contentLists.map(
-                (someContentList, contentListIndex) => {
-                  return (
-                    <ListItem
-                      key={`${contentListIndex}`}
-                      secondaryAction={
-                        <Box
-                          visibility={
-                            currentUserCanEditProfile ? 'visible' : 'hidden'
-                          }
-                        >
-                          <MenuButton
-                            buttonColor={'default'}
-                            buttonIcon={<MoreVert />}
-                            menuItems={[
-                              <MenuItem key={'edit-list-item'}>
-                                Edit List
-                              </MenuItem>,
-                              <MenuItem key={'delete-list-item'}>
-                                Delete List
-                              </MenuItem>,
-                            ]}
-                          />
-                        </Box>
-                      }
-                    >
+          </Box>
+          <Divider />
+          <List>
+            {userProfile.contentLists.map(
+              (someContentList, contentListIndex) => {
+                return (
+                  <ListItem
+                    key={`${contentListIndex}`}
+                    secondaryAction={
                       <Box
-                        padding={1}
-                        paddingLeft={0}
-                        display={'flex'}
-                        flexDirection={'row'}
-                        flexWrap={'wrap'}
-                        alignItems={'baseline'}
+                        visibility={
+                          currentUserCanEditProfile ? 'visible' : 'hidden'
+                        }
                       >
-                        <Link href={`/content-list/${someContentList.id}`}>
-                          <Typography variant={'subtitle2'} fontWeight={600}>
-                            {someContentList.contentListTitle}
-                          </Typography>
-                        </Link>
-                        <Typography
-                          variant={'caption'}
-                          color={'error.main'}
-                          fontWeight={500}
-                          paddingLeft={1}
-                        >
-                          nsfw
-                        </Typography>
+                        <MenuButton
+                          buttonColor={'default'}
+                          buttonIcon={<MoreVert />}
+                          menuItems={[
+                            <MenuItem key={'edit-list-item'}>
+                              Edit List
+                            </MenuItem>,
+                            <MenuItem key={'delete-list-item'}>
+                              Delete List
+                            </MenuItem>,
+                          ]}
+                        />
                       </Box>
-                    </ListItem>
-                  )
-                }
-              )}
-            </List>
-          </Stack>
-        )
-      })
+                    }
+                  >
+                    <Box
+                      padding={1}
+                      paddingLeft={0}
+                      display={'flex'}
+                      flexDirection={'row'}
+                      flexWrap={'wrap'}
+                      alignItems={'baseline'}
+                    >
+                      <Link href={`/content-list/${someContentList.id}`}>
+                        <Typography variant={'subtitle2'} fontWeight={600}>
+                          {someContentList.contentListTitle}
+                        </Typography>
+                      </Link>
+                      <Typography
+                        variant={'caption'}
+                        color={'error.main'}
+                        fontWeight={500}
+                        paddingLeft={1}
+                      >
+                        nsfw
+                      </Typography>
+                    </Box>
+                  </ListItem>
+                )
+              }
+            )}
+          </List>
+        </Stack>
+      )
+    })
   }, [routeParams.userId])
   return currentUser === null ? (
     <LoggedOutUserPage pageBody={pageBody} />

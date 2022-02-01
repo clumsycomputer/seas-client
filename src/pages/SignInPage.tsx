@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Page } from '../components/Page'
 import { CurrentUser } from '../models/User'
+import { createAuthToken, getCurrentUser } from '../services/SeasService'
 
 export function SignInPage() {
   const navigateToPage = useNavigate()
@@ -53,40 +54,25 @@ export function SignInPage() {
           <Button
             color={'inherit'}
             onClick={() => {
-              fetch(`http://localhost:8000/rest-auth/login/`, {
-                method: 'POST',
-                headers: {
-                  Accept: 'application/json',
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  email: formState.email,
-                  password: formState.password,
-                }),
-              })
-                .then((loginResponse) => loginResponse.json())
-                .then((loginResponseData: unknown) => {
-                  const authToken = (loginResponseData as { key: string }).key
-                  return fetch('http://localhost:8000/current-user', {
-                    headers: {
-                      Accept: 'application/json',
-                      'Content-Type': 'application/json',
-                      Authorization: `Token ${authToken}`,
-                    },
-                  })
-                    .then((currentUserResponse) => currentUserResponse.json())
-                    .then((currentUserData: unknown) => {
-                      const currentUser = currentUserData as CurrentUser
-                      window.localStorage.setItem(
-                        'currentUser',
-                        JSON.stringify({
-                          ...currentUser,
-                          authToken,
-                        })
-                      )
-                      navigateToPage(`/${currentUser.id}`)
+              createAuthToken({
+                email: formState.email,
+                password: formState.password,
+              }).then((authTokenData: unknown) => {
+                const authToken = (authTokenData as { key: string }).key
+                return getCurrentUser({
+                  authToken,
+                }).then((currentUserData: unknown) => {
+                  const currentUser = currentUserData as CurrentUser
+                  window.localStorage.setItem(
+                    'currentUser',
+                    JSON.stringify({
+                      ...currentUser,
+                      authToken,
                     })
+                  )
+                  navigateToPage(`/${currentUser.id}`)
                 })
+              })
             }}
           >
             Sign In
