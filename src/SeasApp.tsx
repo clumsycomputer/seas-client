@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { ContentListPage } from './pages/ContentListPage'
+import { CreateContentListPage } from './pages/CreateContentListPage'
 import { LandingPage } from './pages/LandingPage'
 import { SignInPage } from './pages/SignInPage'
 import { UserProfilePage } from './pages/UserProfilePage'
@@ -13,6 +14,10 @@ export function SeasApp() {
       <Route
         path={'/content-list/:contentListId'}
         element={<ContentListPage />}
+      />
+      <Route
+        path={'/content-list/create'}
+        element={<CreateContentListPage />}
       />
       {/* <Route
         path={'/content-list/create'}

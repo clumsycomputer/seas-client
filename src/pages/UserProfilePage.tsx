@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material'
 import { ReactNode, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { MenuButton } from '../components/MenuButton'
 import { LoggedInUserPage, LoggedOutUserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
@@ -20,6 +20,7 @@ import { getUserProfile } from '../services/SeasService'
 
 export function UserProfilePage() {
   const routeParams = useParams()
+  const navigateSite = useNavigate()
   const currentUser = useCurrentUser()
   const [pageBody, setPageBody] = useState<ReactNode>(null)
   useEffect(() => {
@@ -43,7 +44,7 @@ export function UserProfilePage() {
               >
                 <IconButton
                   onClick={() => {
-                    // todo
+                    navigateSite('/content-list/create')
                   }}
                 >
                   <AddRounded />
