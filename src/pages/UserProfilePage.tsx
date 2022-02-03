@@ -38,7 +38,7 @@ export function UserProfilePage() {
               </Typography>
             </Box>
             <Box flexGrow={1} />
-            <Box padding={1} paddingRight={2} display={'flex'}>
+            <Box padding={1} display={'flex'}>
               <Box
                 visibility={currentUserCanEditProfile ? 'visible' : 'hidden'}
               >
@@ -69,12 +69,18 @@ export function UserProfilePage() {
                           buttonColor={'default'}
                           buttonIcon={<MoreVert />}
                           menuItems={[
-                            <MenuItem key={'edit-list-item'}>
-                              Edit List
-                            </MenuItem>,
-                            <MenuItem key={'delete-list-item'}>
-                              Delete List
-                            </MenuItem>,
+                            {
+                              children: 'Edit List',
+                              onClick: () => {
+                                navigateSite(
+                                  `/content-list/${someContentList.id}/edit`
+                                )
+                              },
+                            },
+                            {
+                              children: 'Delete List',
+                              onClick: () => {},
+                            },
                           ]}
                         />
                       </Box>

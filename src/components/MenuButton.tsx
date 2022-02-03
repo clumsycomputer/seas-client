@@ -1,11 +1,17 @@
 import { MoreVert } from '@mui/icons-material'
-import { IconButton, IconButtonProps, Menu } from '@mui/material'
+import {
+  IconButton,
+  IconButtonProps,
+  Menu,
+  MenuItem,
+  MenuItemProps,
+} from '@mui/material'
 import { Fragment, ReactNode, useRef, useState } from 'react'
 
 export interface MenuButtonProps {
   buttonColor: IconButtonProps['color']
   buttonIcon: ReactNode
-  menuItems: Array<ReactNode>
+  menuItems: Array<MenuItemProps>
 }
 
 export function MenuButton(props: MenuButtonProps) {
@@ -39,7 +45,19 @@ export function MenuButton(props: MenuButtonProps) {
           setMenuOpen(false)
         }}
       >
-        {menuItems}
+        {menuItems.map((someMenuItem) => {
+          return (
+            <MenuItem
+              {...someMenuItem}
+              onClick={(clickEvent) => {
+                if (someMenuItem.onClick) {
+                  someMenuItem.onClick(clickEvent)
+                }
+                setMenuOpen(false)
+              }}
+            />
+          )
+        })}
       </Menu>
     </Fragment>
   )

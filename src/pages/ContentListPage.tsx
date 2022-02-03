@@ -5,21 +5,21 @@ import {
   Link,
   List,
   ListItem,
-  MenuItem,
   Stack,
   Typography,
 } from '@mui/material'
 import { ReactNode, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { MenuButton } from '../components/MenuButton'
 import { LoggedInUserPage, LoggedOutUserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { ContentList } from '../models/ContentList'
-import { getContentList } from '../services/SeasService'
+import { deleteContentList, getContentList } from '../services/SeasService'
 
 export function ContentListPage() {
   const currentUser = useCurrentUser()
   const routeParams = useParams()
+  const navigateToPage = useNavigate()
   const [pageBody, setPageBody] = useState<ReactNode>(null)
   useEffect(() => {
     getContentList({
@@ -61,14 +61,29 @@ export function ContentListPage() {
               </Box>
             </Stack>
             <Box flexGrow={1} />
-            <Box paddingRight={1}>
+            <Box>
               <Box visibility={currentUserCanEditList ? 'visible' : 'hidden'}>
                 <MenuButton
                   buttonColor={'default'}
                   buttonIcon={<MoreVert />}
                   menuItems={[
-                    <MenuItem key={'edit-list-item'}>Edit List</MenuItem>,
-                    <MenuItem key={'delete-list-item'}>Delete List</MenuItem>,
+                    {
+                      children: 'Edit List',
+                      onClick: () => {
+                        navigateToPage(`/content-list/${contentList.id}/edit`)
+                      },
+                    },
+                    {
+                      children: 'Delete List',
+                      onClick: () => {
+                        deleteContentList({
+                          authToken: currentUser!.authToken,
+                          contentListId: contentList.id,
+                        }).then(() => {
+                          navigateToPage(`/${currentUser!.id}`)
+                        })
+                      },
+                    },
                   ]}
                 />
               </Box>

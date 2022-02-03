@@ -15,7 +15,7 @@ export function createAuthToken(api: CreateAuthTokenApi) {
       email,
       password,
     },
-  })
+  }).then((authTokenResponse) => authTokenResponse.json())
 }
 
 export interface GetCurrentUserApi
@@ -40,7 +40,7 @@ export function getUserProfile(api: GetUserProfileApi) {
     apiRoute: `/user-profiles/${userId}/`,
     apiMethod: 'GET',
     authToken: null,
-  })
+  }).then((userProfileResponse) => userProfileResponse.json())
 }
 export interface GetContentListApi {
   contentListId: string
@@ -52,7 +52,7 @@ export function getContentList(api: GetContentListApi) {
     apiRoute: `/content-lists/${contentListId}/`,
     apiMethod: 'GET',
     authToken: null,
-  })
+  }).then((contentListResponse) => contentListResponse.json())
 }
 
 export interface CreateContentListApi
@@ -67,10 +67,10 @@ export function createContentList(api: CreateContentListApi) {
   const { authToken, contentListFormData } = api
   return fetchSeasData({
     authToken,
-    apiRoute: `/content-lists/create/`,
+    apiRoute: `/content-lists/`,
     apiMethod: 'POST',
     requestBody: contentListFormData,
-  })
+  }).then((contentListResponse) => contentListResponse.json())
 }
 
 export interface UpdateContentListApi
@@ -89,7 +89,7 @@ export function updateContentList(api: UpdateContentListApi) {
     apiRoute: `/content-lists/${contentListId}/`,
     apiMethod: 'PUT',
     requestBody: contentListFormData,
-  })
+  }).then((contentListResponse) => contentListResponse.json())
 }
 
 export interface DeleteContentListApi
@@ -97,7 +97,7 @@ export interface DeleteContentListApi
   contentListId: string
 }
 
-export function deleteContentList(api: UpdateContentListApi) {
+export function deleteContentList(api: DeleteContentListApi) {
   const { authToken, contentListId } = api
   return fetchSeasData({
     authToken,
@@ -129,5 +129,5 @@ function fetchSeasData(api: FetchSeasDataApi) {
     method: apiMethod,
     headers: requestHeaders,
     body: requestBody ? JSON.stringify(requestBody) : null,
-  }).then((fetchResponse) => fetchResponse.json())
+  })
 }

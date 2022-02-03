@@ -1,5 +1,5 @@
 import { AccountCircle } from '@mui/icons-material'
-import { AppBar, Button, MenuItem, Toolbar, Typography } from '@mui/material'
+import { AppBar, Button, Toolbar, Typography } from '@mui/material'
 import { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CurrentUser } from '../models/User'
@@ -64,17 +64,16 @@ export function LoggedInUserPage(props: LoggedInUserPageProps) {
           buttonColor={'inherit'}
           buttonIcon={<AccountCircle />}
           menuItems={[
-            <MenuItem
-              key={'profile-item'}
-              onClick={() => {
+            {
+              children: 'Profile',
+              onClick: () => {
                 navigateToPage(`/${currentUser.id}`)
-              }}
-            >
-              Profile
-            </MenuItem>,
-            <MenuItem key={'sign-out-item'} onClick={() => {}}>
-              Sign Out
-            </MenuItem>,
+              },
+            },
+            {
+              children: 'Sign Out',
+              onClick: () => {},
+            },
           ]}
         />
       }
