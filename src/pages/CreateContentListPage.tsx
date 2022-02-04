@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { ContentListForm } from '../components/ContentListForm'
 import { LoggedInUserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
-import { createContentList } from '../services/SeasService'
+import { SeasService } from '../services/SeasService'
 
 export function CreateContentListPage() {
   const currentUser = useCurrentUser()
@@ -21,7 +21,7 @@ export function CreateContentListPage() {
             contentListItems: [],
           }}
           submitForm={(contentListFormState) => {
-            createContentList({
+            SeasService.createContentList({
               authToken: currentUser!.authToken,
               contentListFormData: contentListFormState,
             }).then(() => {

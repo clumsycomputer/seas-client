@@ -4,7 +4,7 @@ import { ContentListForm } from '../components/ContentListForm'
 import { LoggedInUserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { ContentList } from '../models/ContentList'
-import { getContentList, updateContentList } from '../services/SeasService'
+import { SeasService } from '../services/SeasService'
 
 export function EditContentListPage() {
   const currentUser = useCurrentUser()
@@ -20,7 +20,7 @@ export function EditContentListPage() {
     status: 'loading',
   })
   useEffect(() => {
-    getContentList({
+    SeasService.getContentList({
       contentListId: routeParams.contentListId!,
     }).then((initialContentList) => {
       setContentListState({
@@ -39,7 +39,7 @@ export function EditContentListPage() {
           formTitle={'Edit List'}
           submitLabel={'Update List'}
           submitForm={(contentListFormState) => {
-            updateContentList({
+            SeasService.updateContentList({
               authToken: currentUser!.authToken,
               contentListId: contentListState.contentList.id,
               contentListFormData: contentListFormState,

@@ -452,8 +452,8 @@ interface FormDisplayProps {
 function FormDisplay(props: FormDisplayProps) {
   const { formTitle, cancelDialogFormAction, formContent, formActions } = props
   return (
-    <Stack padding={2} spacing={2}>
-      <Stack spacing={1 / 2}>
+    <Stack padding={2} spacing={3}>
+      <Stack spacing={0}>
         <Box display={'flex'} flexDirection={'row'} alignItems={'flex-end'}>
           <Typography variant={'h6'} paddingBottom={4 / 7}>
             {formTitle}

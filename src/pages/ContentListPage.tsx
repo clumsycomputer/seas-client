@@ -14,7 +14,7 @@ import { MenuButton } from '../components/MenuButton'
 import { LoggedInUserPage, LoggedOutUserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { ContentList } from '../models/ContentList'
-import { deleteContentList, getContentList } from '../services/SeasService'
+import { SeasService } from '../services/SeasService'
 
 export function ContentListPage() {
   const currentUser = useCurrentUser()
@@ -22,7 +22,7 @@ export function ContentListPage() {
   const navigateToPage = useNavigate()
   const [pageBody, setPageBody] = useState<ReactNode>(null)
   useEffect(() => {
-    getContentList({
+    SeasService.getContentList({
       contentListId: routeParams.contentListId!,
     }).then((contentListData: unknown) => {
       const contentList = contentListData as ContentList
@@ -44,6 +44,11 @@ export function ContentListPage() {
                 </Box>
                 <Box paddingLeft={1}>
                   <Typography
+                    visibility={
+                      contentList.contentListRating === 'NOT_SAFE_FOR_WORK'
+                        ? 'visible'
+                        : 'hidden'
+                    }
                     variant={'caption'}
                     color={'error.main'}
                     fontWeight={500}
@@ -76,7 +81,7 @@ export function ContentListPage() {
                     {
                       children: 'Delete List',
                       onClick: () => {
-                        deleteContentList({
+                        SeasService.deleteContentList({
                           authToken: currentUser!.authToken,
                           contentListId: contentList.id,
                         }).then(() => {

@@ -1,11 +1,21 @@
 import { ContentList } from '../models/ContentList'
 
-export interface CreateAuthTokenApi {
+export const SeasService = {
+  createAuthToken,
+  getCurrentUser,
+  getUserProfile,
+  getContentList,
+  createContentList,
+  updateContentList,
+  deleteContentList,
+}
+
+interface CreateAuthTokenApi {
   email: string
   password: string
 }
 
-export function createAuthToken(api: CreateAuthTokenApi) {
+function createAuthToken(api: CreateAuthTokenApi) {
   const { email, password } = api
   return fetchSeasData({
     apiRoute: `/rest-auth/login/`,
@@ -18,10 +28,9 @@ export function createAuthToken(api: CreateAuthTokenApi) {
   }).then((authTokenResponse) => authTokenResponse.json())
 }
 
-export interface GetCurrentUserApi
-  extends Pick<FetchSeasDataApi, 'authToken'> {}
+interface GetCurrentUserApi extends Pick<FetchSeasDataApi, 'authToken'> {}
 
-export function getCurrentUser(api: GetCurrentUserApi) {
+function getCurrentUser(api: GetCurrentUserApi) {
   const { authToken } = api
   return fetchSeasData({
     authToken,
@@ -30,11 +39,11 @@ export function getCurrentUser(api: GetCurrentUserApi) {
   })
 }
 
-export interface GetUserProfileApi {
+interface GetUserProfileApi {
   userId: string
 }
 
-export function getUserProfile(api: GetUserProfileApi) {
+function getUserProfile(api: GetUserProfileApi) {
   const { userId } = api
   return fetchSeasData({
     apiRoute: `/user-profiles/${userId}/`,
@@ -42,11 +51,11 @@ export function getUserProfile(api: GetUserProfileApi) {
     authToken: null,
   }).then((userProfileResponse) => userProfileResponse.json())
 }
-export interface GetContentListApi {
+interface GetContentListApi {
   contentListId: string
 }
 
-export function getContentList(api: GetContentListApi) {
+function getContentList(api: GetContentListApi) {
   const { contentListId } = api
   return fetchSeasData({
     apiRoute: `/content-lists/${contentListId}/`,
@@ -55,15 +64,14 @@ export function getContentList(api: GetContentListApi) {
   }).then((contentListResponse) => contentListResponse.json())
 }
 
-export interface CreateContentListApi
-  extends Pick<FetchSeasDataApi, 'authToken'> {
+interface CreateContentListApi extends Pick<FetchSeasDataApi, 'authToken'> {
   contentListFormData: Pick<
     ContentList,
     'contentListTitle' | 'contentListRating' | 'contentListItems'
   >
 }
 
-export function createContentList(api: CreateContentListApi) {
+function createContentList(api: CreateContentListApi) {
   const { authToken, contentListFormData } = api
   return fetchSeasData({
     authToken,
@@ -73,8 +81,7 @@ export function createContentList(api: CreateContentListApi) {
   }).then((contentListResponse) => contentListResponse.json())
 }
 
-export interface UpdateContentListApi
-  extends Pick<FetchSeasDataApi, 'authToken'> {
+interface UpdateContentListApi extends Pick<FetchSeasDataApi, 'authToken'> {
   contentListId: string
   contentListFormData: Pick<
     ContentList,
@@ -82,7 +89,7 @@ export interface UpdateContentListApi
   >
 }
 
-export function updateContentList(api: UpdateContentListApi) {
+function updateContentList(api: UpdateContentListApi) {
   const { authToken, contentListId, contentListFormData } = api
   return fetchSeasData({
     authToken,
@@ -92,12 +99,11 @@ export function updateContentList(api: UpdateContentListApi) {
   }).then((contentListResponse) => contentListResponse.json())
 }
 
-export interface DeleteContentListApi
-  extends Pick<FetchSeasDataApi, 'authToken'> {
+interface DeleteContentListApi extends Pick<FetchSeasDataApi, 'authToken'> {
   contentListId: string
 }
 
-export function deleteContentList(api: DeleteContentListApi) {
+function deleteContentList(api: DeleteContentListApi) {
   const { authToken, contentListId } = api
   return fetchSeasData({
     authToken,

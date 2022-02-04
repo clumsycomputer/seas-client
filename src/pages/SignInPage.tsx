@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Page } from '../components/Page'
 import { CurrentUser } from '../models/User'
-import { createAuthToken, getCurrentUser } from '../services/SeasService'
+import { SeasService } from '../services/SeasService'
 
 export function SignInPage() {
   const navigateToPage = useNavigate()
@@ -54,12 +54,12 @@ export function SignInPage() {
           <Button
             color={'inherit'}
             onClick={() => {
-              createAuthToken({
+              SeasService.createAuthToken({
                 email: formState.email,
                 password: formState.password,
               }).then((authTokenData: unknown) => {
                 const authToken = (authTokenData as { key: string }).key
-                return getCurrentUser({
+                return SeasService.getCurrentUser({
                   authToken,
                 }).then((currentUserData: unknown) => {
                   const currentUser = currentUserData as CurrentUser
