@@ -13,6 +13,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { MenuButton } from '../components/MenuButton'
 import { LoggedInUserPage, LoggedOutUserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
+import { useTask } from '../hooks/useTask'
 import { ContentList } from '../models/ContentList'
 import { SeasService } from '../services/SeasService'
 
@@ -20,12 +21,30 @@ export function ContentListPage() {
   const currentUser = useCurrentUser()
   const routeParams = useParams()
   const navigateToPage = useNavigate()
+  const [getContentListState, getContentList] = useTask(async () => {
+    const getContentListData = await SeasService.getContentList({
+      contentListId: routeParams.contentListId!,
+    })
+    const contentList = getContentListData as ContentList
+    return contentList
+  })
+  const [deleteContentListState, deleteContentList] = useTask(async () => {
+    if (getContentListState.taskStatus === 'taskSuccessful') {
+      const contentList = getContentListState.taskResult
+      await SeasService.deleteContentList({
+        authToken: currentUser!.authToken,
+        contentListId: contentList.id,
+      })
+      navigateToPage(`/${currentUser!.id}`)
+    }
+  })
   const [pageBody, setPageBody] = useState<ReactNode>(null)
   useEffect(() => {
-    SeasService.getContentList({
-      contentListId: routeParams.contentListId!,
-    }).then((contentListData: unknown) => {
-      const contentList = contentListData as ContentList
+    getContentList()
+  }, [routeParams.contentListId])
+  useEffect(() => {
+    if (getContentListState.taskStatus === 'taskSuccessful') {
+      const contentList = getContentListState.taskResult
       const currentUserCanEditList =
         currentUser?.id === contentList.contentListAuthor.id
       setPageBody(
@@ -81,12 +100,7 @@ export function ContentListPage() {
                     {
                       children: 'Delete List',
                       onClick: () => {
-                        SeasService.deleteContentList({
-                          authToken: currentUser!.authToken,
-                          contentListId: contentList.id,
-                        }).then(() => {
-                          navigateToPage(`/${currentUser!.id}`)
-                        })
+                        deleteContentList()
                       },
                     },
                   ]}
@@ -137,8 +151,8 @@ export function ContentListPage() {
           </List>
         </Stack>
       )
-    })
-  }, [routeParams.contentListId])
+    }
+  }, [getContentListState])
   return currentUser == null ? (
     <LoggedOutUserPage pageBody={pageBody} />
   ) : (
