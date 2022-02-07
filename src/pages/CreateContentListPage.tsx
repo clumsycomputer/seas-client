@@ -1,18 +1,37 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ContentListForm } from '../components/ContentListForm'
+import {
+  ContentListForm,
+  ContentListFormProps,
+} from '../components/ContentListForm'
 import { LoggedInUserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
+import { useTask } from '../hooks/useTask'
 import { SeasService } from '../services/SeasService'
 
 export function CreateContentListPage() {
   const currentUser = useCurrentUser()
   const navigateToPage = useNavigate()
+  const [createContentListState, createContentList] = useTask(
+    async (
+      contentListFormState: Parameters<ContentListFormProps['submitForm']>[0]
+    ) => {
+      await SeasService.createContentList({
+        authToken: currentUser!.authToken,
+        contentListFormData: contentListFormState,
+      })
+    }
+  )
+  useEffect(() => {
+    if (createContentListState.taskStatus === 'taskSuccessful') {
+      navigateToPage(`/${currentUser!.id}`)
+    }
+  }, [createContentListState])
   return (
     <LoggedInUserPage
       currentUser={currentUser!}
       pageBody={
         <ContentListForm
-          currentUser={currentUser!}
           formTitle={'Create List'}
           submitLabel={'Publish List'}
           initialFormState={{
@@ -21,12 +40,10 @@ export function CreateContentListPage() {
             contentListItems: [],
           }}
           submitForm={(contentListFormState) => {
-            SeasService.createContentList({
-              authToken: currentUser!.authToken,
-              contentListFormData: contentListFormState,
-            }).then(() => {
-              navigateToPage(`/${currentUser!.id}`)
-            })
+            createContentList(contentListFormState)
+          }}
+          cancelContentListForm={() => {
+            navigateToPage(`/${currentUser!.id}`)
           }}
         />
       }

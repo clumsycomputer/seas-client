@@ -17,19 +17,16 @@ import {
   Typography,
 } from '@mui/material'
 import { Fragment, ReactNode, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
   ContentItem,
   ContentList,
   ContentListRating,
 } from '../models/ContentList'
-import { CurrentUser } from '../models/User'
 import { MenuButton } from './MenuButton'
 
 export interface ContentListFormProps {
   formTitle: string
   submitLabel: string
-  currentUser: CurrentUser
   initialFormState: Pick<
     ContentList,
     'contentListTitle' | 'contentListRating' | 'contentListItems'
@@ -40,12 +37,17 @@ export interface ContentListFormProps {
       'contentListTitle' | 'contentListRating' | 'contentListItems'
     >
   ) => void
+  cancelContentListForm: () => void
 }
 
 export function ContentListForm(props: ContentListFormProps) {
-  const { currentUser, initialFormState, formTitle, submitLabel, submitForm } =
-    props
-  const navigateToPage = useNavigate()
+  const {
+    initialFormState,
+    formTitle,
+    cancelContentListForm,
+    submitLabel,
+    submitForm,
+  } = props
   const [formState, setFormState] =
     useState<ContentListFormProps['initialFormState']>(initialFormState)
   const [contentItemFormDialogState, setContentItemFormDialogState] = useState<
@@ -67,7 +69,7 @@ export function ContentListForm(props: ContentListFormProps) {
       cancelDialogFormAction={
         <IconButton
           onClick={() => {
-            navigateToPage(`/${currentUser.id}`)
+            cancelContentListForm()
           }}
         >
           <CloseRounded />

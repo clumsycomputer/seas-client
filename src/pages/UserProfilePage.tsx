@@ -68,9 +68,9 @@ export function UserProfilePage() {
           />
         ) : (
           <UserProfileDisplay
-            userProfile={userProfile}
             createContentListButton={null}
             getContentListOptionsButton={() => null}
+            userProfile={userProfile}
           />
         )
       )

@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ContentListForm } from '../components/ContentListForm'
 import { LoggedInUserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
+import { useTask } from '../hooks/useTask'
 import { ContentList } from '../models/ContentList'
 import { SeasService } from '../services/SeasService'
 
@@ -10,47 +11,53 @@ export function EditContentListPage() {
   const currentUser = useCurrentUser()
   const routeParams = useParams()
   const navigateToPage = useNavigate()
-  const [contentListState, setContentListState] = useState<
-    | { status: 'loading' }
-    | {
-        status: 'success'
-        contentList: ContentList
-      }
-  >({
-    status: 'loading',
-  })
-  useEffect(() => {
-    SeasService.getContentList({
-      contentListId: routeParams.contentListId!,
-    }).then((initialContentList) => {
-      setContentListState({
-        status: 'success',
-        contentList: initialContentList,
+  const [pageBody, setPageBody] = useState<ReactNode>(null)
+  const [getInitialContentListState, getInitialContentList] = useTask(
+    async () => {
+      const getContentListData: unknown = await SeasService.getContentList({
+        contentListId: routeParams.contentListId!,
       })
-    })
+      const contentList = getContentListData as ContentList
+      return contentList
+    }
+  )
+  const [updateContentListState, updateContentList] = useTask(
+    async (contentListFormData) => {
+      if (getInitialContentListState.taskStatus === 'taskSuccessful') {
+        const initialContentList = getInitialContentListState.taskResult
+        await SeasService.updateContentList({
+          authToken: currentUser!.authToken,
+          contentListId: initialContentList.id,
+          contentListFormData: contentListFormData,
+        })
+      }
+    }
+  )
+  useEffect(() => {
+    getInitialContentList()
   }, [])
-  return contentListState.status === 'success' ? (
-    <LoggedInUserPage
-      currentUser={currentUser!}
-      pageBody={
+  useEffect(() => {
+    if (updateContentListState.taskStatus === 'taskSuccessful') {
+      navigateToPage(`/content-list/${routeParams.contentListId!}`)
+    }
+  }, [updateContentListState])
+  useEffect(() => {
+    if (getInitialContentListState.taskStatus === 'taskSuccessful') {
+      const initialContentList = getInitialContentListState.taskResult
+      setPageBody(
         <ContentListForm
-          currentUser={currentUser!}
-          initialFormState={contentListState.contentList}
+          initialFormState={initialContentList}
           formTitle={'Edit List'}
           submitLabel={'Update List'}
-          submitForm={(contentListFormState) => {
-            SeasService.updateContentList({
-              authToken: currentUser!.authToken,
-              contentListId: contentListState.contentList.id,
-              contentListFormData: contentListFormState,
-            }).then((updateContentList) => {
-              navigateToPage(`/content-list/${updateContentList.id}`)
-            })
+          submitForm={(contentListFormData) => {
+            updateContentList(contentListFormData)
+          }}
+          cancelContentListForm={() => {
+            navigateToPage(`/${currentUser!.id}`)
           }}
         />
-      }
-    />
-  ) : (
-    <div>Loading...</div>
-  )
+      )
+    }
+  }, [getInitialContentListState])
+  return <LoggedInUserPage currentUser={currentUser!} pageBody={pageBody} />
 }
