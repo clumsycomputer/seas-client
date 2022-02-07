@@ -60,7 +60,9 @@ export function UserProfilePage() {
               navigateToPage(`/content-list/create`)
             }}
             navigateToEditContentListPage={(someContentList) => {
-              navigateToPage(`/content-list/${someContentList.id}/edit`)
+              navigateToPage(
+                `/content-list/${someContentList.id}/edit?cancel-route=${window.location.pathname}`
+              )
             }}
             deleteContentList={(someContentList) => {
               deleteUserProfile(someContentList.id)

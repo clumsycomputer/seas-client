@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ContentListForm } from '../components/ContentListForm'
 import { LoggedInUserPage } from '../components/Page'
@@ -41,6 +41,11 @@ export function EditContentListPage() {
       navigateToPage(`/content-list/${routeParams.contentListId!}`)
     }
   }, [updateContentListState])
+  const cancelRedirectionRoute = useMemo(() => {
+    const currentSearchParams = new URLSearchParams(window.location.search)
+    const cancelRidirectionRoute = currentSearchParams.get('cancel-route')
+    return cancelRidirectionRoute || `/${currentUser!.id}`
+  }, [])
   useEffect(() => {
     if (getInitialContentListState.taskStatus === 'taskSuccessful') {
       const initialContentList = getInitialContentListState.taskResult
@@ -53,7 +58,7 @@ export function EditContentListPage() {
             updateContentList(contentListFormData)
           }}
           cancelContentListForm={() => {
-            navigateToPage(`/${currentUser!.id}`)
+            navigateToPage(cancelRedirectionRoute)
           }}
         />
       )

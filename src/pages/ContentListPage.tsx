@@ -53,7 +53,9 @@ export function ContentListPage() {
             contentList={contentList}
             deleteContentList={deleteContentList}
             navigateToEditContentListPage={() => {
-              navigateToPage(`/content-list/${contentList.id}/edit`)
+              navigateToPage(
+                `/content-list/${contentList.id}/edit?cancel-route=${window.location.pathname}`
+              )
             }}
           />
         ) : (
