@@ -1,8 +1,10 @@
 import { AccountCircle } from '@mui/icons-material'
 import { AppBar, Button, Toolbar, Typography } from '@mui/material'
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTask } from '../hooks/useTask'
 import { CurrentUser } from '../models/User'
+import { SeasService } from '../services/SeasService'
 import { MenuButton } from './MenuButton'
 
 export interface PageProps {
@@ -72,7 +74,11 @@ export function LoggedInUserPage(props: LoggedInUserPageProps) {
             },
             {
               children: 'Sign Out',
-              onClick: () => {},
+              onClick: () => {
+                navigateToPage(
+                  `/sign-out?target-route=${window.location.pathname}`
+                )
+              },
             },
           ]}
         />

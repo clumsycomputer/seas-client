@@ -2,6 +2,7 @@ import { ContentList } from '../models/ContentList'
 
 export const SeasService = {
   createAuthToken,
+  cancelAuthToken,
   getCurrentUser,
   getUserProfile,
   getContentList,
@@ -28,6 +29,17 @@ function createAuthToken(api: CreateAuthTokenApi) {
   }).then((authTokenResponse) => authTokenResponse.json())
 }
 
+interface CancelAuthTokenApi extends Pick<FetchSeasDataApi, 'authToken'> {}
+
+function cancelAuthToken(api: CancelAuthTokenApi) {
+  const { authToken } = api
+  return fetchSeasData({
+    authToken,
+    apiRoute: '/rest-auth/logout/',
+    apiMethod: 'POST',
+  })
+}
+
 interface GetCurrentUserApi extends Pick<FetchSeasDataApi, 'authToken'> {}
 
 function getCurrentUser(api: GetCurrentUserApi) {
@@ -36,7 +48,7 @@ function getCurrentUser(api: GetCurrentUserApi) {
     authToken,
     apiRoute: `/current-user/`,
     apiMethod: 'GET',
-  })
+  }).then((currentUserResponse) => currentUserResponse.json())
 }
 
 interface GetUserProfileApi {

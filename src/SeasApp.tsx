@@ -4,6 +4,7 @@ import { CreateContentListPage } from './pages/CreateContentListPage'
 import { EditContentListPage } from './pages/EditContentListPage'
 import { LandingPage } from './pages/LandingPage'
 import { SignInPage } from './pages/SignInPage'
+import { SignOutPage } from './pages/SignOutPage'
 import { UserProfilePage } from './pages/UserProfilePage'
 
 export function SeasApp() {
@@ -11,6 +12,7 @@ export function SeasApp() {
     <Routes>
       <Route path={'/'} element={<LandingPage />} />
       <Route path={'/sign-in'} element={<SignInPage />} />
+      <Route path={'/sign-out'} element={<SignOutPage />} />
       <Route path={'/:userId'} element={<UserProfilePage />} />
       <Route
         path={'/content-list/create'}
