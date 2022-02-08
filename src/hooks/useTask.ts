@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export type TaskState<TaskResult> =
   | {
@@ -25,6 +25,9 @@ export function useTask<
   const triggerTask: (...args: Parameters<typeof someTask>) => void = (
     ...args
   ) => {
+    setTaskState({
+      taskStatus: 'taskActive',
+    })
     someTask(...args)
       .then((taskResult) => {
         setTaskState({
@@ -38,9 +41,6 @@ export function useTask<
           taskStatus: 'taskError',
         })
       })
-    setTaskState({
-      taskStatus: 'taskActive',
-    })
   }
   return [taskState, triggerTask]
 }

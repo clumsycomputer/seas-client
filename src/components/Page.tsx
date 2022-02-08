@@ -1,65 +1,35 @@
 import { AccountCircle } from '@mui/icons-material'
-import { AppBar, Button, Toolbar, Typography } from '@mui/material'
-import { ReactNode, useEffect } from 'react'
+import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material'
+import { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useTask } from '../hooks/useTask'
+import { useCurrentUser } from '../hooks/useCurrentUser'
 import { CurrentUser } from '../models/User'
-import { SeasService } from '../services/SeasService'
 import { MenuButton } from './MenuButton'
 
-export interface PageProps {
-  currentUserButton: ReactNode
-  pageBody: ReactNode
+export interface UserPageProps extends Pick<PageBaseProps, 'pageBody'> {
+  currentUser: ReturnType<typeof useCurrentUser>
 }
 
-export function Page(props: PageProps) {
-  const { currentUserButton, pageBody } = props
-  return (
-    <div>
-      <AppBar position={'static'} elevation={0}>
-        <Toolbar>
-          <Typography variant={'h6'} sx={{ flexGrow: 1 }}>
-            seas.io
-          </Typography>
-          {currentUserButton}
-        </Toolbar>
-      </AppBar>
-      {pageBody}
-    </div>
-  )
+export function UserPage(props: UserPageProps) {
+  const { currentUser, pageBody } = props
+  if (currentUser === null) {
+    return <LoggedOutPage pageBody={pageBody} />
+  } else if (currentUser) {
+    return <LoggedInPage currentUser={currentUser} pageBody={pageBody} />
+  } else {
+    throw new Error('wtf? UserPage')
+  }
 }
 
-export interface LoggedOutUserPageProps extends Pick<PageProps, 'pageBody'> {}
-
-export function LoggedOutUserPage(props: LoggedOutUserPageProps) {
-  const { pageBody } = props
-  const navigateToPage = useNavigate()
-  return (
-    <Page
-      pageBody={pageBody}
-      currentUserButton={
-        <Button
-          color={'inherit'}
-          onClick={() => {
-            navigateToPage('/sign-in')
-          }}
-        >
-          Sign In
-        </Button>
-      }
-    />
-  )
-}
-
-export interface LoggedInUserPageProps extends Pick<PageProps, 'pageBody'> {
+interface LoggedInPageProps extends Pick<PageBaseProps, 'pageBody'> {
   currentUser: CurrentUser
 }
 
-export function LoggedInUserPage(props: LoggedInUserPageProps) {
+function LoggedInPage(props: LoggedInPageProps) {
   const { pageBody, currentUser } = props
   const navigateToPage = useNavigate()
   return (
-    <Page
+    <PageBase
       pageBody={pageBody}
       currentUserButton={
         <MenuButton
@@ -84,5 +54,56 @@ export function LoggedInUserPage(props: LoggedInUserPageProps) {
         />
       }
     />
+  )
+}
+
+interface LoggedOutPageProps extends Pick<PageBaseProps, 'pageBody'> {}
+
+function LoggedOutPage(props: LoggedOutPageProps) {
+  const { pageBody } = props
+  const navigateToPage = useNavigate()
+  return (
+    <PageBase
+      pageBody={pageBody}
+      currentUserButton={
+        <Button
+          color={'inherit'}
+          onClick={() => {
+            navigateToPage('/sign-in')
+          }}
+        >
+          Sign In
+        </Button>
+      }
+    />
+  )
+}
+
+export interface UserlessPageProps extends Pick<PageBaseProps, 'pageBody'> {}
+
+export function UserlessPage(props: UserlessPageProps) {
+  const { pageBody } = props
+  return <PageBase currentUserButton={null} pageBody={pageBody} />
+}
+
+interface PageBaseProps {
+  currentUserButton: ReactNode
+  pageBody: ReactNode
+}
+
+function PageBase(props: PageBaseProps) {
+  const { currentUserButton, pageBody } = props
+  return (
+    <Box display={'flex'} flexDirection={'column'} sx={{ height: '100vh' }}>
+      <AppBar position={'static'} elevation={0}>
+        <Toolbar>
+          <Typography variant={'h6'} sx={{ flexGrow: 1 }}>
+            seas.io
+          </Typography>
+          {currentUserButton}
+        </Toolbar>
+      </AppBar>
+      {pageBody}
+    </Box>
   )
 }

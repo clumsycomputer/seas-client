@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Page } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
 import { SeasService } from '../services/SeasService'
@@ -23,8 +22,10 @@ export function SignOutPage() {
       window.localStorage.removeItem('currentUser')
       const currentSearchParams = new URLSearchParams(window.location.search)
       const targetRoute = currentSearchParams.get('target-route')
-      navigateToPage(targetRoute || '/')
+      navigateToPage(targetRoute || '/', {
+        replace: true,
+      })
     }
   }, [cancelAuthTokenState])
-  return <Page currentUserButton={null} pageBody={null} />
+  return null
 }

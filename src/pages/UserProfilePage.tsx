@@ -3,16 +3,17 @@ import {
   Box,
   Divider,
   IconButton,
-  Link,
   List,
   ListItem,
   Stack,
   Typography,
+  Link as MuiLink,
 } from '@mui/material'
 import { ReactNode, useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
+import { LoadingPageBody } from '../components/LoadingPageBody'
 import { MenuButton } from '../components/MenuButton'
-import { LoggedInUserPage, LoggedOutUserPage } from '../components/Page'
+import { UserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
 import { UserProfile } from '../models/User'
@@ -22,9 +23,8 @@ export function UserProfilePage() {
   const routeParams = useParams()
   const navigateToPage = useNavigate()
   const currentUser = useCurrentUser()
-  const [pageBody, setPageBody] = useState<ReactNode>(null)
   const [getUserProfileState, getUserProfile] = useTask(async () => {
-    const userProfileData: unknown = SeasService.getUserProfile({
+    const userProfileData: unknown = await SeasService.getUserProfile({
       userId: routeParams.userId!,
     })
     const userProfile = userProfileData as UserProfile
@@ -33,7 +33,7 @@ export function UserProfilePage() {
   const [deleteUserProfileState, deleteUserProfile] = useTask(
     async (contentListId: string) => {
       if (currentUser) {
-        SeasService.deleteContentList({
+        await SeasService.deleteContentList({
           authToken: currentUser.authToken,
           contentListId: contentListId,
         })
@@ -48,41 +48,51 @@ export function UserProfilePage() {
       getUserProfile()
     }
   }, [deleteUserProfileState])
+  const [pageBody, setPageBody] = useState<ReactNode>(null)
   useEffect(() => {
-    if (getUserProfileState.taskStatus === 'taskSuccessful') {
-      const userProfile = getUserProfileState.taskResult
-      const currentUserCanEditProfile = userProfile.id === currentUser?.id
+    if (
+      currentUser &&
+      getUserProfileState.taskStatus === 'taskSuccessful' &&
+      getUserProfileState.taskResult.id === currentUser.id
+    ) {
       setPageBody(
-        currentUserCanEditProfile ? (
-          <EditableUserProfileDisplay
-            userProfile={userProfile}
-            navigateToCreateContentListPage={() => {
-              navigateToPage(`/content-list/create`)
-            }}
-            navigateToEditContentListPage={(someContentList) => {
-              navigateToPage(
-                `/content-list/${someContentList.id}/edit?cancel-route=${window.location.pathname}`
-              )
-            }}
-            deleteContentList={(someContentList) => {
-              deleteUserProfile(someContentList.id)
-            }}
-          />
-        ) : (
-          <UserProfileDisplay
-            createContentListButton={null}
-            getContentListOptionsButton={() => null}
-            userProfile={userProfile}
-          />
-        )
+        <EditableUserProfileDisplay
+          userProfile={getUserProfileState.taskResult}
+          navigateToCreateContentListPage={() => {
+            navigateToPage(`/content-list/create`, {
+              replace: true,
+            })
+          }}
+          navigateToEditContentListPage={(someContentList) => {
+            navigateToPage(
+              `/content-list/${someContentList.id}/edit?cancel-route=${window.location.pathname}`,
+              {
+                replace: true,
+              }
+            )
+          }}
+          deleteContentList={(someContentList) => {
+            deleteUserProfile(someContentList.id)
+          }}
+        />
       )
+    } else if (getUserProfileState.taskStatus === 'taskSuccessful') {
+      setPageBody(
+        <UserProfileDisplay
+          createContentListButton={null}
+          getContentListOptionsButton={() => null}
+          userProfile={getUserProfileState.taskResult}
+        />
+      )
+    } else if (
+      (getUserProfileState.taskStatus === 'taskNotInitialized' ||
+        getUserProfileState.taskStatus === 'taskActive') &&
+      deleteUserProfileState.taskStatus === 'taskNotInitialized'
+    ) {
+      setPageBody(<LoadingPageBody />)
     }
   }, [getUserProfileState])
-  return currentUser === null ? (
-    <LoggedOutUserPage pageBody={pageBody} />
-  ) : (
-    <LoggedInUserPage currentUser={currentUser} pageBody={pageBody} />
-  )
+  return <UserPage currentUser={currentUser} pageBody={pageBody} />
 }
 
 interface EditableUserProfileDisplayProps
@@ -191,10 +201,12 @@ function UserProfileDisplay(props: UserProfileDisplayProps) {
                 flexWrap={'wrap'}
                 alignItems={'baseline'}
               >
-                <Link href={`/content-list/${someContentList.id}`}>
-                  <Typography variant={'subtitle2'} fontWeight={600}>
-                    {someContentList.contentListTitle}
-                  </Typography>
+                <Link replace={true} to={`/content-list/${someContentList.id}`}>
+                  <MuiLink>
+                    <Typography variant={'subtitle2'} fontWeight={600}>
+                      {someContentList.contentListTitle}
+                    </Typography>
+                  </MuiLink>
                 </Link>
                 <Typography
                   visibility={

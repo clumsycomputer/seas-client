@@ -2,6 +2,7 @@ import { CloseRounded, MoreVert } from '@mui/icons-material'
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   Divider,
   FormControl,
@@ -16,7 +17,8 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { Fragment, ReactNode, useState } from 'react'
+import { Fragment, ReactNode, useEffect, useState } from 'react'
+import { TaskState } from '../hooks/useTask'
 import {
   ContentItem,
   ContentList,
@@ -31,6 +33,7 @@ export interface ContentListFormProps {
     ContentList,
     'contentListTitle' | 'contentListRating' | 'contentListItems'
   >
+  submitFormState: TaskState<void>
   submitForm: (
     formState: Pick<
       ContentList,
@@ -46,6 +49,7 @@ export function ContentListForm(props: ContentListFormProps) {
     formTitle,
     cancelContentListForm,
     submitLabel,
+    submitFormState,
     submitForm,
   } = props
   const [formState, setFormState] =
@@ -330,14 +334,31 @@ export function ContentListForm(props: ContentListFormProps) {
         </Fragment>
       }
       formActions={
-        <Button
-          variant={'contained'}
-          onClick={() => {
-            submitForm(formState)
-          }}
-        >
-          {submitLabel}
-        </Button>
+        <Fragment>
+          <Button
+            disabled={submitFormState.taskStatus === 'taskActive'}
+            variant={'contained'}
+            onClick={() => {
+              submitForm(formState)
+            }}
+          >
+            <Box display={'relative'}>
+              {submitLabel}
+              {submitFormState.taskStatus === 'taskActive' ? (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: '-12px',
+                    marginLeft: '-12px',
+                  }}
+                />
+              ) : null}
+            </Box>
+          </Button>
+        </Fragment>
       }
     />
   )

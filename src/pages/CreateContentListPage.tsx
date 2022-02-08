@@ -4,7 +4,7 @@ import {
   ContentListForm,
   ContentListFormProps,
 } from '../components/ContentListForm'
-import { LoggedInUserPage } from '../components/Page'
+import { UserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
 import { SeasService } from '../services/SeasService'
@@ -16,20 +16,22 @@ export function CreateContentListPage() {
     async (
       contentListFormState: Parameters<ContentListFormProps['submitForm']>[0]
     ) => {
-      await SeasService.createContentList({
-        authToken: currentUser!.authToken,
-        contentListFormData: contentListFormState,
-      })
+      if (currentUser) {
+        await SeasService.createContentList({
+          authToken: currentUser.authToken,
+          contentListFormData: contentListFormState,
+        })
+      }
     }
   )
   useEffect(() => {
-    if (createContentListState.taskStatus === 'taskSuccessful') {
-      navigateToPage(`/${currentUser!.id}`)
+    if (currentUser && createContentListState.taskStatus === 'taskSuccessful') {
+      navigateToPage(`/${currentUser.id}`)
     }
   }, [createContentListState])
   return (
-    <LoggedInUserPage
-      currentUser={currentUser!}
+    <UserPage
+      currentUser={currentUser}
       pageBody={
         <ContentListForm
           formTitle={'Create List'}
@@ -39,11 +41,16 @@ export function CreateContentListPage() {
             contentListRating: 'SAFE_FOR_WORK',
             contentListItems: [],
           }}
+          submitFormState={createContentListState}
           submitForm={(contentListFormState) => {
             createContentList(contentListFormState)
           }}
           cancelContentListForm={() => {
-            navigateToPage(`/${currentUser!.id}`)
+            if (currentUser) {
+              navigateToPage(`/${currentUser.id}`, {
+                replace: true,
+              })
+            }
           }}
         />
       }

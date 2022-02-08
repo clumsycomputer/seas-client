@@ -1,7 +1,7 @@
 import { Box, Button, Stack, TextField, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Page } from '../components/Page'
+import { UserlessPage } from '../components/Page'
 import { useTask } from '../hooks/useTask'
 import { CurrentUser } from '../models/User'
 import { SeasService } from '../services/SeasService'
@@ -29,14 +29,13 @@ export function SignInPage() {
     if (getCurrentUserState.taskStatus === 'taskSuccessful') {
       const currentUser = getCurrentUserState.taskResult
       window.localStorage.setItem('currentUser', JSON.stringify(currentUser))
-      navigateToPage(`/${currentUser.id}`)
+      navigateToPage(`/${currentUser.id}`, {
+        replace: true,
+      })
     }
   }, [getCurrentUserState])
   return (
-    <Page
-      currentUserButton={null}
-      pageBody={<SignInForm getCurrentUser={getCurrentUser} />}
-    />
+    <UserlessPage pageBody={<SignInForm getCurrentUser={getCurrentUser} />} />
   )
 }
 

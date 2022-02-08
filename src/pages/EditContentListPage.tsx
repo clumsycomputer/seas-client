@@ -1,7 +1,8 @@
-import { ReactNode, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ContentListForm } from '../components/ContentListForm'
-import { LoggedInUserPage } from '../components/Page'
+import { LoadingPageBody } from '../components/LoadingPageBody'
+import { UserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
 import { ContentList } from '../models/ContentList'
@@ -11,7 +12,6 @@ export function EditContentListPage() {
   const currentUser = useCurrentUser()
   const routeParams = useParams()
   const navigateToPage = useNavigate()
-  const [pageBody, setPageBody] = useState<ReactNode>(null)
   const [getInitialContentListState, getInitialContentList] = useTask(
     async () => {
       const getContentListData: unknown = await SeasService.getContentList({
@@ -38,31 +38,41 @@ export function EditContentListPage() {
   }, [])
   useEffect(() => {
     if (updateContentListState.taskStatus === 'taskSuccessful') {
-      navigateToPage(`/content-list/${routeParams.contentListId!}`)
+      navigateToPage(`/content-list/${routeParams.contentListId!}`, {
+        replace: true,
+      })
     }
   }, [updateContentListState])
-  const cancelRedirectionRoute = useMemo(() => {
-    const currentSearchParams = new URLSearchParams(window.location.search)
-    const cancelRidirectionRoute = currentSearchParams.get('cancel-route')
-    return cancelRidirectionRoute || `/${currentUser!.id}`
-  }, [])
+  const [pageBody, setPageBody] = useState<ReactNode>(null)
   useEffect(() => {
-    if (getInitialContentListState.taskStatus === 'taskSuccessful') {
-      const initialContentList = getInitialContentListState.taskResult
+    if (
+      currentUser &&
+      getInitialContentListState.taskStatus === 'taskSuccessful'
+    ) {
       setPageBody(
         <ContentListForm
-          initialFormState={initialContentList}
+          initialFormState={getInitialContentListState.taskResult}
           formTitle={'Edit List'}
           submitLabel={'Update List'}
+          submitFormState={updateContentListState}
           submitForm={(contentListFormData) => {
             updateContentList(contentListFormData)
           }}
           cancelContentListForm={() => {
-            navigateToPage(cancelRedirectionRoute)
+            const currentSearchParams = new URLSearchParams(
+              window.location.search
+            )
+            const cancelRidirectionRoute =
+              currentSearchParams.get('cancel-route')
+            navigateToPage(cancelRidirectionRoute || `/${currentUser.id}`, {
+              replace: true,
+            })
           }}
         />
       )
+    } else {
+      setPageBody(<LoadingPageBody />)
     }
-  }, [getInitialContentListState])
-  return <LoggedInUserPage currentUser={currentUser!} pageBody={pageBody} />
+  }, [getInitialContentListState, updateContentListState])
+  return <UserPage currentUser={currentUser} pageBody={pageBody} />
 }

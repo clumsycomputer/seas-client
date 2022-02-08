@@ -2,16 +2,17 @@ import { MoreVert } from '@mui/icons-material'
 import {
   Box,
   Divider,
-  Link,
   List,
   ListItem,
   Stack,
   Typography,
+  Link as MuiLink,
 } from '@mui/material'
 import { ReactNode, useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
+import { LoadingPageBody } from '../components/LoadingPageBody'
 import { MenuButton } from '../components/MenuButton'
-import { LoggedInUserPage, LoggedOutUserPage } from '../components/Page'
+import { UserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
 import { ContentList } from '../models/ContentList'
@@ -29,54 +30,57 @@ export function ContentListPage() {
     return contentList
   })
   const [deleteContentListState, deleteContentList] = useTask(async () => {
-    if (getContentListState.taskStatus === 'taskSuccessful') {
+    if (currentUser && getContentListState.taskStatus === 'taskSuccessful') {
       const contentList = getContentListState.taskResult
       await SeasService.deleteContentList({
-        authToken: currentUser!.authToken,
+        authToken: currentUser.authToken,
         contentListId: contentList.id,
       })
     }
   })
-
-  const [pageBody, setPageBody] = useState<ReactNode>(null)
   useEffect(() => {
     getContentList()
   }, [routeParams.contentListId])
+  const [pageBody, setPageBody] = useState<ReactNode>(null)
   useEffect(() => {
-    if (getContentListState.taskStatus === 'taskSuccessful') {
-      const contentList = getContentListState.taskResult
-      const currentUserCanEditList =
-        currentUser?.id === contentList.contentListAuthor.id
+    if (
+      currentUser &&
+      getContentListState.taskStatus === 'taskSuccessful' &&
+      currentUser.id === getContentListState.taskResult.id
+    ) {
       setPageBody(
-        currentUserCanEditList ? (
-          <EditableContentListPageBody
-            contentList={contentList}
-            deleteContentList={deleteContentList}
-            navigateToEditContentListPage={() => {
-              navigateToPage(
-                `/content-list/${contentList.id}/edit?cancel-route=${window.location.pathname}`
-              )
-            }}
-          />
-        ) : (
-          <ContentListPageBody
-            editContentListMenuButton={null}
-            contentList={contentList}
-          />
-        )
+        <EditableContentListPageBody
+          contentList={getContentListState.taskResult}
+          deleteContentList={deleteContentList}
+          navigateToEditContentListPage={() => {
+            navigateToPage(
+              `/content-list/${getContentListState.taskResult.id}/edit?cancel-route=${window.location.pathname}`,
+              {
+                replace: true,
+              }
+            )
+          }}
+        />
       )
+    } else if (getContentListState.taskStatus === 'taskSuccessful') {
+      setPageBody(
+        <ContentListPageBody
+          editContentListMenuButton={null}
+          contentList={getContentListState.taskResult}
+        />
+      )
+    } else {
+      setPageBody(<LoadingPageBody />)
     }
   }, [getContentListState])
   useEffect(() => {
-    if (deleteContentListState.taskStatus === 'taskSuccessful') {
-      navigateToPage(`/${currentUser!.id}`)
+    if (currentUser && deleteContentListState.taskStatus === 'taskSuccessful') {
+      navigateToPage(`/${currentUser.id}`, {
+        replace: true,
+      })
     }
-  }, [])
-  return currentUser == null ? (
-    <LoggedOutUserPage pageBody={pageBody} />
-  ) : (
-    <LoggedInUserPage currentUser={currentUser} pageBody={pageBody} />
-  )
+  }, [deleteContentListState])
+  return <UserPage currentUser={currentUser} pageBody={pageBody} />
 }
 
 interface EditableContentPageBodyProps
@@ -148,10 +152,12 @@ function ContentListPageBody(props: ContentListPageBodyProps) {
             </Box>
           </Box>
           <Box>
-            <Link href={`/${contentList.contentListAuthor.id}`}>
-              <Typography variant={'body2'} fontWeight={500}>
-                {contentList.contentListAuthor.username}
-              </Typography>
+            <Link replace={true} to={`/${contentList.contentListAuthor.id}`}>
+              <MuiLink>
+                <Typography variant={'body2'} fontWeight={500}>
+                  {contentList.contentListAuthor.username}
+                </Typography>
+              </MuiLink>
             </Link>
           </Box>
         </Stack>
@@ -182,11 +188,11 @@ function ContentListPageBody(props: ContentListPageBodyProps) {
                       (someContentLink, contentLinkIndex) => {
                         return (
                           <Box key={`${contentLinkIndex}`}>
-                            <Link href={someContentLink.contentLinkUrl}>
+                            <MuiLink href={someContentLink.contentLinkUrl}>
                               <Typography variant={'body2'} fontWeight={500}>
                                 {someContentLink.contentLinkHostName}
                               </Typography>
-                            </Link>
+                            </MuiLink>
                           </Box>
                         )
                       }
