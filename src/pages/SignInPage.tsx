@@ -1,8 +1,15 @@
-import { Box, Button, Stack, TextField, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { UserlessPage } from '../components/Page'
-import { useTask } from '../hooks/useTask'
+import { TaskState, useTask } from '../hooks/useTask'
 import { CurrentUser } from '../models/User'
 import { SeasService } from '../services/SeasService'
 
@@ -35,16 +42,24 @@ export function SignInPage() {
     }
   }, [getCurrentUserState])
   return (
-    <UserlessPage pageBody={<SignInForm getCurrentUser={getCurrentUser} />} />
+    <UserlessPage
+      pageBody={
+        <SignInForm
+          getCurrentUserState={getCurrentUserState}
+          getCurrentUser={getCurrentUser}
+        />
+      }
+    />
   )
 }
 
 interface SignInFormProps {
   getCurrentUser: (signInFormData: { email: string; password: string }) => void
+  getCurrentUserState: TaskState<CurrentUser>
 }
 
 function SignInForm(props: SignInFormProps) {
-  const { getCurrentUser } = props
+  const { getCurrentUser, getCurrentUserState } = props
   const [formState, setFormState] = useState<{
     email: string
     password: string
@@ -87,12 +102,25 @@ function SignInForm(props: SignInFormProps) {
         }}
       />
       <Button
-        color={'inherit'}
+        color={'primary'}
+        disabled={getCurrentUserState.taskStatus === 'taskActive'}
         onClick={() => {
           getCurrentUser(formState)
         }}
       >
         Sign In
+        {getCurrentUserState.taskStatus === 'taskActive' ? (
+          <CircularProgress
+            size={24}
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              marginTop: '-12px',
+              marginLeft: '-12px',
+            }}
+          />
+        ) : null}
       </Button>
     </Stack>
   )

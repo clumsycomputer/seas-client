@@ -1,4 +1,7 @@
-import { ContentList } from '../models/ContentList'
+import * as IO from 'io-ts'
+import { decodeData } from '../helpers/decodeData'
+import { ContentList, ContentListCodec } from '../models/ContentList'
+import { UserProfile, UserProfileCodec } from '../models/User'
 
 export const SeasService = {
   createAuthToken,
@@ -26,7 +29,14 @@ function createAuthToken(api: CreateAuthTokenApi) {
       email,
       password,
     },
-  }).then((authTokenResponse) => authTokenResponse.json())
+  })
+    .then((authTokenResponse) => authTokenResponse.json())
+    .then((authTokenData: unknown) => {
+      return decodeData<{ key: string }>({
+        targetCodec: IO.exact(IO.type({ key: IO.string })),
+        inputData: authTokenData,
+      })
+    })
 }
 
 interface CancelAuthTokenApi extends Pick<FetchSeasDataApi, 'authToken'> {}
@@ -52,7 +62,7 @@ function getCurrentUser(api: GetCurrentUserApi) {
 }
 
 interface GetUserProfileApi {
-  userId: string
+  userId: UserProfile['id']
 }
 
 function getUserProfile(api: GetUserProfileApi) {
@@ -61,10 +71,17 @@ function getUserProfile(api: GetUserProfileApi) {
     apiRoute: `/user-profiles/${userId}/`,
     apiMethod: 'GET',
     authToken: null,
-  }).then((userProfileResponse) => userProfileResponse.json())
+  })
+    .then((userProfileResponse) => userProfileResponse.json())
+    .then((userProfileData: unknown) => {
+      return decodeData<UserProfile>({
+        targetCodec: UserProfileCodec,
+        inputData: userProfileData,
+      })
+    })
 }
 interface GetContentListApi {
-  contentListId: string
+  contentListId: ContentList['id']
 }
 
 function getContentList(api: GetContentListApi) {
@@ -73,7 +90,14 @@ function getContentList(api: GetContentListApi) {
     apiRoute: `/content-lists/${contentListId}/`,
     apiMethod: 'GET',
     authToken: null,
-  }).then((contentListResponse) => contentListResponse.json())
+  })
+    .then((contentListResponse) => contentListResponse.json())
+    .then((contentListData: unknown) => {
+      return decodeData<ContentList>({
+        targetCodec: ContentListCodec,
+        inputData: contentListData,
+      })
+    })
 }
 
 interface CreateContentListApi extends Pick<FetchSeasDataApi, 'authToken'> {
@@ -94,7 +118,7 @@ function createContentList(api: CreateContentListApi) {
 }
 
 interface UpdateContentListApi extends Pick<FetchSeasDataApi, 'authToken'> {
-  contentListId: string
+  contentListId: ContentList['id']
   contentListFormData: Pick<
     ContentList,
     'contentListTitle' | 'contentListRating' | 'contentListItems'
@@ -112,7 +136,7 @@ function updateContentList(api: UpdateContentListApi) {
 }
 
 interface DeleteContentListApi extends Pick<FetchSeasDataApi, 'authToken'> {
-  contentListId: string
+  contentListId: ContentList['id']
 }
 
 function deleteContentList(api: DeleteContentListApi) {

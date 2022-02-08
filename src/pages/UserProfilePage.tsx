@@ -24,18 +24,23 @@ export function UserProfilePage() {
   const navigateToPage = useNavigate()
   const currentUser = useCurrentUser()
   const [getUserProfileState, getUserProfile] = useTask(async () => {
-    const userProfileData: unknown = await SeasService.getUserProfile({
-      userId: routeParams.userId!,
+    const userProfile = await SeasService.getUserProfile({
+      userId: parseInt(routeParams.userId!),
     })
-    const userProfile = userProfileData as UserProfile
     return userProfile
   })
   const [deleteUserProfileState, deleteUserProfile] = useTask(
-    async (contentListId: string) => {
+    async (
+      api: Pick<
+        Parameters<typeof SeasService.deleteContentList>[0],
+        'contentListId'
+      >
+    ) => {
+      const { contentListId } = api
       if (currentUser) {
         await SeasService.deleteContentList({
+          contentListId,
           authToken: currentUser.authToken,
-          contentListId: contentListId,
         })
       }
     }
@@ -72,7 +77,9 @@ export function UserProfilePage() {
             )
           }}
           deleteContentList={(someContentList) => {
-            deleteUserProfile(someContentList.id)
+            deleteUserProfile({
+              contentListId: someContentList.id,
+            })
           }}
         />
       )
@@ -180,51 +187,76 @@ function UserProfileDisplay(props: UserProfileDisplayProps) {
       </Box>
       <Divider />
       <List>
-        {userProfile.contentLists.map((someContentList, contentListIndex) => {
-          return (
-            <ListItem
-              key={`${contentListIndex}`}
-              secondaryAction={
-                <Box>
-                  {getContentListOptionsButton(
-                    someContentList,
-                    contentListIndex
-                  )}
-                </Box>
-              }
-            >
-              <Box
-                padding={1}
-                paddingLeft={0}
-                display={'flex'}
-                flexDirection={'row'}
-                flexWrap={'wrap'}
-                alignItems={'baseline'}
+        {userProfile.contentLists.length > 0 ? (
+          userProfile.contentLists.map((someContentList, contentListIndex) => {
+            return (
+              <ListItem
+                key={`${contentListIndex}`}
+                secondaryAction={
+                  <Box>
+                    {getContentListOptionsButton(
+                      someContentList,
+                      contentListIndex
+                    )}
+                  </Box>
+                }
               >
-                <Link replace={true} to={`/content-list/${someContentList.id}`}>
-                  <MuiLink>
-                    <Typography variant={'subtitle2'} fontWeight={600}>
-                      {someContentList.contentListTitle}
-                    </Typography>
-                  </MuiLink>
-                </Link>
-                <Typography
-                  visibility={
-                    someContentList.contentListRating === 'NOT_SAFE_FOR_WORK'
-                      ? 'visible'
-                      : 'hidden'
-                  }
-                  variant={'caption'}
-                  color={'error.main'}
-                  fontWeight={500}
-                  paddingLeft={1}
+                <Box
+                  padding={1}
+                  paddingLeft={0}
+                  display={'flex'}
+                  flexDirection={'row'}
+                  flexWrap={'wrap'}
+                  alignItems={'baseline'}
                 >
-                  nsfw
-                </Typography>
-              </Box>
-            </ListItem>
-          )
-        })}
+                  <Link
+                    replace={true}
+                    to={`/content-list/${someContentList.id}`}
+                  >
+                    <MuiLink>
+                      <Typography variant={'subtitle2'} fontWeight={600}>
+                        {someContentList.contentListTitle}
+                      </Typography>
+                    </MuiLink>
+                  </Link>
+                  <Typography
+                    visibility={
+                      someContentList.contentListRating === 'NOT_SAFE_FOR_WORK'
+                        ? 'visible'
+                        : 'hidden'
+                    }
+                    variant={'caption'}
+                    color={'error.main'}
+                    fontWeight={500}
+                    paddingLeft={1}
+                  >
+                    nsfw
+                  </Typography>
+                </Box>
+              </ListItem>
+            )
+          })
+        ) : (
+          <ListItem>
+            <Box
+              paddingTop={8}
+              flexGrow={1}
+              display={'flex'}
+              flexDirection={'row'}
+              justifyContent={'center'}
+              alignItems={'center'}
+            >
+              <Typography
+                variant={'subtitle2'}
+                color={'GrayText'}
+                fontSize={14}
+                fontStyle={'italic'}
+              >
+                No Content Lists
+              </Typography>
+            </Box>
+          </ListItem>
+        )}
       </List>
     </Stack>
   )

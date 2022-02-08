@@ -24,7 +24,7 @@ export function ContentListPage() {
   const navigateToPage = useNavigate()
   const [getContentListState, getContentList] = useTask(async () => {
     const getContentListData = await SeasService.getContentList({
-      contentListId: routeParams.contentListId!,
+      contentListId: parseInt(routeParams.contentListId!),
     })
     const contentList = getContentListData as ContentList
     return contentList
@@ -46,7 +46,7 @@ export function ContentListPage() {
     if (
       currentUser &&
       getContentListState.taskStatus === 'taskSuccessful' &&
-      currentUser.id === getContentListState.taskResult.id
+      currentUser.id === getContentListState.taskResult.contentListAuthor.id
     ) {
       setPageBody(
         <EditableContentListPageBody

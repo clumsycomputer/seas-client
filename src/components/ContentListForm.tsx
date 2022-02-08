@@ -17,7 +17,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { Fragment, ReactNode, useEffect, useState } from 'react'
+import { Fragment, ReactNode, useState } from 'react'
 import { TaskState } from '../hooks/useTask'
 import {
   ContentItem,

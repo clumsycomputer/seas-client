@@ -1,5 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { LoadingPageBody } from '../components/LoadingPageBody'
+import { UserlessPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
 import { SeasService } from '../services/SeasService'
@@ -27,5 +29,5 @@ export function SignOutPage() {
       })
     }
   }, [cancelAuthTokenState])
-  return null
+  return <UserlessPage pageBody={<LoadingPageBody />} />
 }

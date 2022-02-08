@@ -15,7 +15,7 @@ export function EditContentListPage() {
   const [getInitialContentListState, getInitialContentList] = useTask(
     async () => {
       const getContentListData: unknown = await SeasService.getContentList({
-        contentListId: routeParams.contentListId!,
+        contentListId: parseInt(routeParams.contentListId!),
       })
       const contentList = getContentListData as ContentList
       return contentList
