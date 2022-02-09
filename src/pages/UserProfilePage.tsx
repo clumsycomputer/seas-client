@@ -58,7 +58,7 @@ export function UserProfilePage() {
     if (
       currentUser &&
       getUserProfileState.taskStatus === 'taskSuccessful' &&
-      getUserProfileState.taskResult.id === currentUser.id
+      currentUser.id === getUserProfileState.taskResult.id
     ) {
       setPageBody(
         <EditableUserProfileDisplay

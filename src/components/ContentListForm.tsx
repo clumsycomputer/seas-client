@@ -25,6 +25,7 @@ import {
   ContentListRating,
 } from '../models/ContentList'
 import { MenuButton } from './MenuButton'
+import * as Yup from 'yup'
 
 export interface ContentListFormProps {
   formTitle: string
@@ -117,6 +118,7 @@ export function ContentListForm(props: ContentListFormProps) {
                 (someContentItem, contentItemIndex) => {
                   return (
                     <ListItem
+                      key={`${Math.random()}`}
                       secondaryAction={
                         <Box>
                           <MenuButton
@@ -322,12 +324,12 @@ export function ContentListForm(props: ContentListFormProps) {
                 formTitle={contentItemFormDialogState.formTitle}
                 submitLabel={contentItemFormDialogState.submitLabel}
                 initialFormState={contentItemFormDialogState.initialFormState}
+                updateContentList={contentItemFormDialogState.updateContentList}
                 cancelContentItemForm={() => {
                   setContentItemFormDialogState({
                     dialogOpen: false,
                   })
                 }}
-                updateContentList={contentItemFormDialogState.updateContentList}
               />
             ) : null}
           </Dialog>
@@ -381,6 +383,7 @@ function ContentItemForm(props: ContentItemFormProps) {
     submitLabel,
   } = props
   const [formState, setFormState] = useState<ContentItem>(initialFormState)
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({})
   return (
     <FormDisplay
       formTitle={formTitle}
@@ -399,6 +402,8 @@ function ContentItemForm(props: ContentItemFormProps) {
             variant={'standard'}
             label={'Title'}
             value={formState.contentItemTitle}
+            error={Boolean(formErrors?.contentItemTitle)}
+            helperText={formErrors?.contentItemTitle}
             onChange={(changeEvent) => {
               setFormState({
                 ...formState,
@@ -410,6 +415,8 @@ function ContentItemForm(props: ContentItemFormProps) {
             variant={'standard'}
             label={'Author'}
             value={formState.contentItemAuthor}
+            error={Boolean(formErrors?.contentItemAuthor)}
+            helperText={formErrors?.contentItemAuthor}
             onChange={(changeEvent) => {
               setFormState({
                 ...formState,
@@ -421,6 +428,8 @@ function ContentItemForm(props: ContentItemFormProps) {
             variant={'standard'}
             label={'Host Name'}
             value={formState.contentItemLinks[0].contentLinkHostName}
+            error={Boolean(formErrors?.contentLinkHostName)}
+            helperText={formErrors?.contentLinkHostName}
             onChange={(changeEvent) => {
               setFormState({
                 ...formState,
@@ -437,6 +446,8 @@ function ContentItemForm(props: ContentItemFormProps) {
             variant={'standard'}
             label={'Url'}
             value={formState.contentItemLinks[0].contentLinkUrl}
+            error={Boolean(formErrors?.contentLinkUrl)}
+            helperText={formErrors?.contentLinkUrl}
             onChange={(changeEvent) => {
               setFormState({
                 ...formState,
@@ -454,8 +465,32 @@ function ContentItemForm(props: ContentItemFormProps) {
       formActions={
         <Button
           variant={'contained'}
-          onClick={() => {
-            updateContentList(formState)
+          onClick={async () => {
+            try {
+              await Yup.object({
+                contentItemTitle: Yup.string().required(),
+                contentItemAuthor: Yup.string().required(),
+                contentLinkHostName: Yup.string().required(),
+                contentLinkUrl: Yup.string().url().required(),
+              }).validate(
+                {
+                  contentItemTitle: formState.contentItemTitle,
+                  contentItemAuthor: formState.contentItemAuthor,
+                  contentLinkHostName:
+                    formState.contentItemLinks[0].contentLinkHostName,
+                  contentLinkUrl: formState.contentItemLinks[0].contentLinkUrl,
+                },
+                {
+                  strict: true,
+                  abortEarly: false,
+                }
+              )
+              updateContentList(formState)
+            } catch (someFormValidationError: unknown) {
+              if (someFormValidationError instanceof Yup.ValidationError) {
+                setFormErrors(parseYupFormErrors(someFormValidationError))
+              }
+            }
           }}
         >
           {submitLabel}
@@ -496,5 +531,17 @@ function FormDisplay(props: FormDisplayProps) {
         {formActions}
       </Box>
     </Stack>
+  )
+}
+
+function parseYupFormErrors(
+  someYupValidationError: Yup.ValidationError
+): Record<string, string> {
+  return someYupValidationError.inner.reduce<Record<string, string>>(
+    (formErrorsResult, someValidationError) => {
+      formErrorsResult[someValidationError.path!] = someValidationError.type!
+      return formErrorsResult
+    },
+    {} as Record<string, string>
   )
 }

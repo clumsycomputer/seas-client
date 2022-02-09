@@ -45,9 +45,10 @@ export function MenuButton(props: MenuButtonProps) {
           setMenuOpen(false)
         }}
       >
-        {menuItems.map((someMenuItem) => {
+        {menuItems.map((someMenuItem, menuItemIndex) => {
           return (
             <MenuItem
+              key={`${menuItemIndex}`}
               {...someMenuItem}
               onClick={(clickEvent) => {
                 if (someMenuItem.onClick) {
