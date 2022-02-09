@@ -14,22 +14,24 @@ export function EditContentListPage() {
   const navigateToPage = useNavigate()
   const [getInitialContentListState, getInitialContentList] = useTask(
     async () => {
-      const getContentListData: unknown = await SeasService.getContentList({
+      const initialContentList = await SeasService.getContentList({
         contentListId: parseInt(routeParams.contentListId!),
       })
-      const contentList = getContentListData as ContentList
-      return contentList
+      return initialContentList
     }
   )
   const [updateContentListState, updateContentList] = useTask(
     async (contentListFormData) => {
       if (getInitialContentListState.taskStatus === 'taskSuccessful') {
         const initialContentList = getInitialContentListState.taskResult
-        await SeasService.updateContentList({
+        const updatedContentList = await SeasService.updateContentList({
           authToken: currentUser!.authToken,
           contentListId: initialContentList.id,
           contentListFormData: contentListFormData,
         })
+        return updatedContentList
+      } else {
+        throw new Error('wtf? updateContentListTask')
       }
     }
   )
@@ -38,7 +40,7 @@ export function EditContentListPage() {
   }, [])
   useEffect(() => {
     if (updateContentListState.taskStatus === 'taskSuccessful') {
-      navigateToPage(`/content-list/${routeParams.contentListId!}`, {
+      navigateToPage(`/content-list/${updateContentListState.taskResult.id}`, {
         replace: true,
       })
     }

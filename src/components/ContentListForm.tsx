@@ -33,7 +33,7 @@ export interface ContentListFormProps {
     ContentList,
     'contentListTitle' | 'contentListRating' | 'contentListItems'
   >
-  submitFormState: TaskState<void>
+  submitFormState: TaskState<ContentList>
   submitForm: (
     formState: Pick<
       ContentList,

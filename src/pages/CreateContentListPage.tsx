@@ -17,16 +17,19 @@ export function CreateContentListPage() {
       contentListFormState: Parameters<ContentListFormProps['submitForm']>[0]
     ) => {
       if (currentUser) {
-        await SeasService.createContentList({
+        const createdContentList = await SeasService.createContentList({
           authToken: currentUser.authToken,
           contentListFormData: contentListFormState,
         })
+        return createdContentList
+      } else {
+        throw new Error('wtf? createContentListTask')
       }
     }
   )
   useEffect(() => {
     if (currentUser && createContentListState.taskStatus === 'taskSuccessful') {
-      navigateToPage(`/${currentUser.id}`)
+      navigateToPage(`/content-list/${createContentListState.taskResult.id}`)
     }
   }, [createContentListState])
   return (

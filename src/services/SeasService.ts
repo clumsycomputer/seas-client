@@ -1,7 +1,12 @@
 import * as IO from 'io-ts'
 import { decodeData } from '../helpers/decodeData'
-import { ContentList, ContentListCodec } from '../models/ContentList'
-import { UserProfile, UserProfileCodec } from '../models/User'
+import { ContentList, getContentListCodec } from '../models/ContentList'
+import {
+  UserProfile,
+  getUserProfileCodec,
+  CurrentUser,
+  getCurrentUserCodec,
+} from '../models/User'
 
 export const SeasService = {
   createAuthToken,
@@ -58,7 +63,17 @@ function getCurrentUser(api: GetCurrentUserApi) {
     authToken,
     apiRoute: `/current-user/`,
     apiMethod: 'GET',
-  }).then((currentUserResponse) => currentUserResponse.json())
+  })
+    .then((currentUserResponse) => currentUserResponse.json())
+    .then((currentUserData: unknown) => {
+      return decodeData<CurrentUser>({
+        targetCodec: getCurrentUserCodec(),
+        inputData: {
+          ...(currentUserData as object),
+          authToken,
+        },
+      })
+    })
 }
 
 interface GetUserProfileApi {
@@ -75,11 +90,12 @@ function getUserProfile(api: GetUserProfileApi) {
     .then((userProfileResponse) => userProfileResponse.json())
     .then((userProfileData: unknown) => {
       return decodeData<UserProfile>({
-        targetCodec: UserProfileCodec,
+        targetCodec: getUserProfileCodec(),
         inputData: userProfileData,
       })
     })
 }
+
 interface GetContentListApi {
   contentListId: ContentList['id']
 }
@@ -94,7 +110,7 @@ function getContentList(api: GetContentListApi) {
     .then((contentListResponse) => contentListResponse.json())
     .then((contentListData: unknown) => {
       return decodeData<ContentList>({
-        targetCodec: ContentListCodec,
+        targetCodec: getContentListCodec(),
         inputData: contentListData,
       })
     })
@@ -114,7 +130,14 @@ function createContentList(api: CreateContentListApi) {
     apiRoute: `/content-lists/`,
     apiMethod: 'POST',
     requestBody: contentListFormData,
-  }).then((contentListResponse) => contentListResponse.json())
+  })
+    .then((contentListResponse) => contentListResponse.json())
+    .then((contentListData: unknown) => {
+      return decodeData<ContentList>({
+        targetCodec: getContentListCodec(),
+        inputData: contentListData,
+      })
+    })
 }
 
 interface UpdateContentListApi extends Pick<FetchSeasDataApi, 'authToken'> {
@@ -132,7 +155,14 @@ function updateContentList(api: UpdateContentListApi) {
     apiRoute: `/content-lists/${contentListId}/`,
     apiMethod: 'PUT',
     requestBody: contentListFormData,
-  }).then((contentListResponse) => contentListResponse.json())
+  })
+    .then((contentListResponse) => contentListResponse.json())
+    .then((contentListData: unknown) => {
+      return decodeData<ContentList>({
+        targetCodec: getContentListCodec(),
+        inputData: contentListData,
+      })
+    })
 }
 
 interface DeleteContentListApi extends Pick<FetchSeasDataApi, 'authToken'> {
