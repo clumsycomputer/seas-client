@@ -9,6 +9,7 @@ import {
   Typography,
   Link as MuiLink,
 } from '@mui/material'
+import React from 'react'
 import { ReactNode, useEffect, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { LoadingPageBody } from '../components/LoadingPageBody'
@@ -209,16 +210,15 @@ function UserProfileDisplay(props: UserProfileDisplayProps) {
                   flexWrap={'wrap'}
                   alignItems={'baseline'}
                 >
-                  <Link
+                  <MuiLink
+                    component={Link}
                     replace={true}
                     to={`/content-list/${someContentList.id}`}
                   >
-                    <MuiLink>
-                      <Typography variant={'subtitle2'} fontWeight={600}>
-                        {someContentList.contentListTitle}
-                      </Typography>
-                    </MuiLink>
-                  </Link>
+                    <Typography variant={'subtitle2'} fontWeight={600}>
+                      {someContentList.contentListTitle}
+                    </Typography>
+                  </MuiLink>
                   <Typography
                     visibility={
                       someContentList.contentListRating === 'NOT_SAFE_FOR_WORK'
@@ -261,3 +261,7 @@ function UserProfileDisplay(props: UserProfileDisplayProps) {
     </Stack>
   )
 }
+
+// const LinkBehavior = React.forwardRef((props, ref) => (
+//   <Link ref={ref} to="/getting-started/installation/" {...props} />
+// ))

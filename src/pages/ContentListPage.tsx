@@ -7,6 +7,7 @@ import {
   Stack,
   Typography,
   Link as MuiLink,
+  useTheme,
 } from '@mui/material'
 import { ReactNode, useEffect, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
@@ -17,6 +18,7 @@ import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
 import { ContentList } from '../models/ContentList'
 import { SeasService } from '../services/SeasService'
+// import { primary } from '@mui/material/colors'
 
 export function ContentListPage() {
   const currentUser = useCurrentUser()
@@ -126,6 +128,7 @@ interface ContentListPageBodyProps {
 
 function ContentListPageBody(props: ContentListPageBodyProps) {
   const { contentList, editContentListMenuButton } = props
+  const theme = useTheme()
   return (
     <Stack padding={1}>
       <Box padding={1} display={'flex'} flexDirection={'row'}>
@@ -152,13 +155,15 @@ function ContentListPageBody(props: ContentListPageBodyProps) {
             </Box>
           </Box>
           <Box>
-            <Link replace={true} to={`/${contentList.contentListAuthor.id}`}>
-              <MuiLink>
-                <Typography variant={'body2'} fontWeight={500}>
-                  {contentList.contentListAuthor.username}
-                </Typography>
-              </MuiLink>
-            </Link>
+            <MuiLink
+              component={Link}
+              replace={true}
+              to={`/${contentList.contentListAuthor.id}`}
+            >
+              <Typography variant={'body2'} fontWeight={500}>
+                {contentList.contentListAuthor.username}
+              </Typography>
+            </MuiLink>
           </Box>
         </Stack>
         <Box flexGrow={1} />
