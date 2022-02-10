@@ -26,6 +26,7 @@ import {
 } from '../models/ContentList'
 import { MenuButton } from './MenuButton'
 import * as Yup from 'yup'
+import { SSTextField } from './FormFields'
 
 export interface ContentListFormProps {
   formTitle: string
@@ -55,6 +56,7 @@ export function ContentListForm(props: ContentListFormProps) {
   } = props
   const [formState, setFormState] =
     useState<ContentListFormProps['initialFormState']>(initialFormState)
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({})
   const [contentItemFormDialogState, setContentItemFormDialogState] = useState<
     | {
         dialogOpen: false
@@ -82,10 +84,12 @@ export function ContentListForm(props: ContentListFormProps) {
       }
       formContent={
         <Fragment>
-          <TextField
-            variant={'standard'}
+          <SSTextField
+            required={true}
             label={'Title'}
             value={formState.contentListTitle}
+            error={Boolean(formErrors?.contentListTitle)}
+            helperText={formErrors?.contentListTitle}
             onChange={(changeEvent) => {
               setFormState({
                 ...formState,
@@ -94,7 +98,7 @@ export function ContentListForm(props: ContentListFormProps) {
             }}
           />
           <FormControl variant={'standard'} sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel>Content Rating</InputLabel>
+            <InputLabel required={true}>Content Rating</InputLabel>
             <Select
               value={formState.contentListRating}
               onChange={(changeEvent) => {
@@ -263,9 +267,11 @@ export function ContentListForm(props: ContentListFormProps) {
                 >
                   <Typography
                     variant={'subtitle2'}
-                    color={'GrayText'}
                     fontSize={14}
                     fontStyle={'italic'}
+                    color={
+                      formErrors?.contentListItems ? 'error.main' : 'GrayText'
+                    }
                   >
                     No Content Items
                   </Typography>
@@ -340,8 +346,29 @@ export function ContentListForm(props: ContentListFormProps) {
           <Button
             disabled={submitFormState.taskStatus === 'taskActive'}
             variant={'contained'}
-            onClick={() => {
-              submitForm(formState)
+            onClick={async () => {
+              try {
+                await Yup.object({
+                  contentListTitle: Yup.string().required(),
+                  contentListRating: Yup.string().required(),
+                  contentListItems: Yup.array().min(1).required(),
+                }).validate(
+                  {
+                    contentListTitle: formState.contentListTitle,
+                    contentListRating: formState.contentListRating,
+                    contentListItems: formState.contentListItems,
+                  },
+                  {
+                    strict: true,
+                    abortEarly: false,
+                  }
+                )
+                submitForm(formState)
+              } catch (someFormValidationError: unknown) {
+                if (someFormValidationError instanceof Yup.ValidationError) {
+                  setFormErrors(parseYupFormErrors(someFormValidationError))
+                }
+              }
             }}
           >
             <Box display={'relative'}>
@@ -398,8 +425,8 @@ function ContentItemForm(props: ContentItemFormProps) {
       }
       formContent={
         <Fragment>
-          <TextField
-            variant={'standard'}
+          <SSTextField
+            required={true}
             label={'Title'}
             value={formState.contentItemTitle}
             error={Boolean(formErrors?.contentItemTitle)}
@@ -411,8 +438,8 @@ function ContentItemForm(props: ContentItemFormProps) {
               })
             }}
           />
-          <TextField
-            variant={'standard'}
+          <SSTextField
+            required={true}
             label={'Author'}
             value={formState.contentItemAuthor}
             error={Boolean(formErrors?.contentItemAuthor)}
@@ -424,8 +451,8 @@ function ContentItemForm(props: ContentItemFormProps) {
               })
             }}
           />
-          <TextField
-            variant={'standard'}
+          <SSTextField
+            required={true}
             label={'Host Name'}
             value={formState.contentItemLinks[0].contentLinkHostName}
             error={Boolean(formErrors?.contentLinkHostName)}
@@ -442,8 +469,8 @@ function ContentItemForm(props: ContentItemFormProps) {
               })
             }}
           />
-          <TextField
-            variant={'standard'}
+          <SSTextField
+            required={true}
             label={'Url'}
             value={formState.contentItemLinks[0].contentLinkUrl}
             error={Boolean(formErrors?.contentLinkUrl)}
@@ -521,7 +548,7 @@ function FormDisplay(props: FormDisplayProps) {
         </Box>
         <Divider sx={{ borderBottomWidth: 2 }} />
       </Stack>
-      <Stack spacing={3}>{formContent}</Stack>
+      <Stack spacing={2.5}>{formContent}</Stack>
       <Box
         display={'flex'}
         flexDirection={'row-reverse'}
