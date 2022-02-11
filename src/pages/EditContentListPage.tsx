@@ -53,7 +53,7 @@ export function EditContentListPage() {
     ) {
       setPageBody(
         <ContentListForm
-          initialFormState={getInitialContentListState.taskResult}
+          initialFormValues={getInitialContentListState.taskResult}
           formTitle={'Edit List'}
           submitLabel={'Update List'}
           submitFormState={updateContentListState}

@@ -3,15 +3,14 @@ import {
   Box,
   Divider,
   IconButton,
+  Link as MuiLink,
   List,
   ListItem,
   Stack,
   Typography,
-  Link as MuiLink,
 } from '@mui/material'
-import React from 'react'
-import { ReactNode, useEffect, useState } from 'react'
-import { useNavigate, useParams, Link } from 'react-router-dom'
+import React, { ReactNode, useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { LoadingPageBody } from '../components/LoadingPageBody'
 import { MenuButton } from '../components/MenuButton'
 import { UserPage } from '../components/Page'
