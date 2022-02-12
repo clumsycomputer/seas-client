@@ -16,7 +16,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import { Fragment, ReactNode, useState } from 'react'
+import { Fragment, ReactNode, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { TaskState } from '../hooks/useTask'
 import {
@@ -77,6 +77,14 @@ export function ContentListForm(props: ContentListFormProps) {
         .required(),
     }),
   })
+  useEffect(() => {
+    if (
+      formErrors.contentListItems === 'min' &&
+      formValues.contentListItems.length > 0
+    ) {
+      validateForm()
+    }
+  }, [formValues, formErrors])
   const [contentItemFormDialogState, setContentItemFormDialogState] = useState<
     | {
         dialogOpen: false
@@ -166,7 +174,9 @@ export function ContentListForm(props: ContentListFormProps) {
                                         someContentItem.contentItemLinks[0]
                                           .contentLinkUrl,
                                     },
-                                    updateContentList: (updatedContentItem) => {
+                                    updateContentList: async (
+                                      updatedContentItem
+                                    ) => {
                                       const nextContentListItems = [
                                         ...formValues.contentListItems,
                                       ]
@@ -304,9 +314,9 @@ export function ContentListForm(props: ContentListFormProps) {
               </ListItem>
             )}
           </List>
-          <Box display={'flex'} flexDirection={'row'}>
+          <Box display={'flex'} flexDirection={'column'}>
             <Button
-              sx={{ flexGrow: 1 }}
+              sx={{ alignSelf: 'stretch' }}
               variant={'outlined'}
               onClick={() => {
                 setContentItemFormDialogState({
@@ -319,7 +329,7 @@ export function ContentListForm(props: ContentListFormProps) {
                     contentLinkHostName: '',
                     contentLinkUrl: '',
                   },
-                  updateContentList: (newContentItem) => {
+                  updateContentList: async (newContentItem) => {
                     setFormValues({
                       contentListItems: [
                         ...formValues.contentListItems,
@@ -335,11 +345,26 @@ export function ContentListForm(props: ContentListFormProps) {
             >
               Add Item
             </Button>
+            <Typography
+              paddingTop={1}
+              alignSelf={'center'}
+              visibility={
+                formErrors?.contentListItems === 'min' &&
+                formValues.contentListItems.length === 0
+                  ? 'visible'
+                  : 'hidden'
+              }
+              variant={'caption'}
+              fontStyle={'italic'}
+              color={'error.main'}
+            >
+              There must be at least one Content Item
+            </Typography>
           </Box>
           <Dialog
             fullWidth={true}
             open={contentItemFormDialogState.dialogOpen}
-            onClose={() => {
+            onClose={async () => {
               setContentItemFormDialogState({
                 dialogOpen: false,
               })
@@ -490,14 +515,14 @@ function ContentItemForm(props: ContentItemFormProps) {
         <Button
           variant={'contained'}
           onClick={async () => {
-            const validatedFormValues = await validateForm()
+            await validateForm()
             updateContentList({
-              contentItemTitle: validatedFormValues.contentItemTitle,
-              contentItemAuthor: validatedFormValues.contentItemAuthor,
+              contentItemTitle: formValues.contentItemTitle,
+              contentItemAuthor: formValues.contentItemAuthor,
               contentItemLinks: [
                 {
-                  contentLinkHostName: validatedFormValues.contentLinkHostName,
-                  contentLinkUrl: validatedFormValues.contentLinkUrl,
+                  contentLinkHostName: formValues.contentLinkHostName,
+                  contentLinkUrl: formValues.contentLinkUrl,
                 },
               ],
             })
@@ -567,7 +592,7 @@ function useForm<CurrentFormShape extends object>(
   setFormValues: (
     newFormValues: Partial<StrictFormShape<CurrentFormShape>>
   ) => void,
-  validateForm: () => Promise<StrictFormShape<CurrentFormShape>>,
+  validateForm: () => Promise<void>,
   formErrors: FormErrors<CurrentFormShape>
 ] {
   const { initialFormValues, formSchema } = api
@@ -588,7 +613,6 @@ function useForm<CurrentFormShape extends object>(
           strict: true,
           abortEarly: false,
         })
-        return formValues
       } catch (someFormValidationError: unknown) {
         if (someFormValidationError instanceof Yup.ValidationError) {
           setFormErrors(parseYupFormErrors(someFormValidationError))
