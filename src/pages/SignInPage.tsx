@@ -14,18 +14,10 @@ export function SignInPage() {
   const navigateToPage = useNavigate()
   const [getCurrentUserState, getCurrentUser] = useTask(
     async (signInFormState) => {
-      const authTokenData: unknown = await SeasService.createAuthToken({
+      const currentUser = await SeasService.createCurrentUser({
         email: signInFormState.email,
         password: signInFormState.password,
       })
-      const authToken = (authTokenData as { key: string }).key
-      const currentUserData: unknown = await SeasService.getCurrentUser({
-        authToken,
-      })
-      const currentUser = {
-        ...(currentUserData as object),
-        authToken,
-      } as CurrentUser
       return currentUser
     }
   )

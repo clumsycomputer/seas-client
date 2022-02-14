@@ -9,9 +9,8 @@ import {
 } from '../models/User'
 
 export const SeasService = {
-  createAuthToken,
+  createCurrentUser,
   cancelAuthToken,
-  getCurrentUser,
   getUserProfile,
   getContentList,
   createContentList,
@@ -19,15 +18,15 @@ export const SeasService = {
   deleteContentList,
 }
 
-interface CreateAuthTokenApi {
+interface CreateCurrentUserApi {
   email: string
   password: string
 }
 
-function createAuthToken(api: CreateAuthTokenApi) {
+function createCurrentUser(api: CreateCurrentUserApi) {
   const { email, password } = api
   return fetchSeasData({
-    apiRoute: `/rest-auth/login/`,
+    apiRoute: `/current-user/`,
     apiMethod: 'POST',
     authToken: null,
     requestBody: {
@@ -35,11 +34,11 @@ function createAuthToken(api: CreateAuthTokenApi) {
       password,
     },
   })
-    .then((authTokenResponse) => authTokenResponse.json())
-    .then((authTokenData: unknown) => {
-      return decodeData<{ key: string }>({
-        targetCodec: IO.exact(IO.type({ key: IO.string })),
-        inputData: authTokenData,
+    .then((currentUserResponse) => currentUserResponse.json())
+    .then((currentUserData: unknown) => {
+      return decodeData<CurrentUser>({
+        targetCodec: getCurrentUserCodec(),
+        inputData: currentUserData,
       })
     })
 }
@@ -53,27 +52,6 @@ function cancelAuthToken(api: CancelAuthTokenApi) {
     apiRoute: '/rest-auth/logout/',
     apiMethod: 'POST',
   })
-}
-
-interface GetCurrentUserApi extends Pick<FetchSeasDataApi, 'authToken'> {}
-
-function getCurrentUser(api: GetCurrentUserApi) {
-  const { authToken } = api
-  return fetchSeasData({
-    authToken,
-    apiRoute: `/current-user/`,
-    apiMethod: 'GET',
-  })
-    .then((currentUserResponse) => currentUserResponse.json())
-    .then((currentUserData: unknown) => {
-      return decodeData<CurrentUser>({
-        targetCodec: getCurrentUserCodec(),
-        inputData: {
-          ...(currentUserData as object),
-          authToken,
-        },
-      })
-    })
 }
 
 interface GetUserProfileApi {
