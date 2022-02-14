@@ -102,13 +102,13 @@ export function ContentListForm(props: ContentListFormProps) {
     <FormDisplay
       formTitle={formTitle}
       cancelDialogFormAction={
-        <IconButton
+        <Button
           onClick={() => {
             cancelContentListForm()
           }}
         >
-          <CloseRounded />
-        </IconButton>
+          Cancel
+        </Button>
       }
       formContent={
         <Fragment>
@@ -414,6 +414,18 @@ export function ContentListForm(props: ContentListFormProps) {
           </Button>
         </Fragment>
       }
+      formError={
+        submitFormState.taskStatus === 'taskError' ? (
+          <Typography
+            display={'flex'}
+            flexDirection={'row-reverse'}
+            variant={'subtitle2'}
+            color={'error.main'}
+          >
+            Oops, something happened!
+          </Typography>
+        ) : null
+      }
     />
   )
 }
@@ -451,13 +463,13 @@ function ContentItemForm(props: ContentItemFormProps) {
     <FormDisplay
       formTitle={formTitle}
       cancelDialogFormAction={
-        <IconButton
+        <Button
           onClick={() => {
             cancelContentItemForm()
           }}
         >
-          <CloseRounded />
-        </IconButton>
+          Cancel
+        </Button>
       }
       formContent={
         <Fragment>
@@ -531,6 +543,7 @@ function ContentItemForm(props: ContentItemFormProps) {
           {submitLabel}
         </Button>
       }
+      formError={null}
     />
   )
 }
@@ -540,10 +553,17 @@ interface FormDisplayProps {
   cancelDialogFormAction: ReactNode
   formContent: ReactNode
   formActions: ReactNode
+  formError: ReactNode
 }
 
 function FormDisplay(props: FormDisplayProps) {
-  const { formTitle, cancelDialogFormAction, formContent, formActions } = props
+  const {
+    formTitle,
+    cancelDialogFormAction,
+    formContent,
+    formActions,
+    formError,
+  } = props
   return (
     <Stack padding={2} spacing={3}>
       <Stack spacing={0}>
@@ -565,6 +585,7 @@ function FormDisplay(props: FormDisplayProps) {
       >
         {formActions}
       </Box>
+      {formError}
     </Stack>
   )
 }
@@ -613,6 +634,7 @@ function useForm<CurrentFormShape extends object>(
           strict: true,
           abortEarly: false,
         })
+        setFormErrors({})
       } catch (someFormValidationError: unknown) {
         if (someFormValidationError instanceof Yup.ValidationError) {
           setFormErrors(parseYupFormErrors(someFormValidationError))
