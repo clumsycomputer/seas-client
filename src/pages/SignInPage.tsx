@@ -1,14 +1,11 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material'
-import { useEffect, useState } from 'react'
+import { Box, Button, CircularProgress, Typography } from '@mui/material'
+import { Fragment, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import * as Yup from 'yup'
+import { FormDisplay } from '../components/FormDisplay'
+import { SSTextField } from '../components/FormFields'
 import { UserlessPage } from '../components/Page'
+import { useForm } from '../hooks/useForm'
 import { TaskState, useTask } from '../hooks/useTask'
 import { CurrentUser } from '../models/User'
 import { SeasService } from '../services/SeasService'
@@ -60,68 +57,89 @@ interface SignInFormProps {
 
 function SignInForm(props: SignInFormProps) {
   const { getCurrentUser, getCurrentUserState } = props
-  const [formState, setFormState] = useState<{
+  const [formValues, setFormValues, validateForm, formErrors] = useForm<{
     email: string
     password: string
   }>({
-    email: '',
-    password: '',
+    initialFormValues: {
+      email: '',
+      password: '',
+    },
+    formSchema: Yup.object({
+      email: Yup.string().email().required(),
+      password: Yup.string().required(),
+    }),
   })
   return (
-    <Stack spacing={2} padding={2}>
-      <Box>
-        <Typography variant={'h6'}>Sign In</Typography>
-        <Box
-          sx={{
-            height: 2,
-            backgroundColor: 'divider',
-          }}
-        />
-      </Box>
-      <TextField
-        variant={'standard'}
-        label={'Email'}
-        value={formState.email}
-        onChange={(changeEvent) => {
-          setFormState({
-            ...formState,
-            email: changeEvent.target.value,
-          })
-        }}
-      />
-      <TextField
-        variant={'standard'}
-        type={'password'}
-        label={'Password'}
-        value={formState.password}
-        onChange={(changeEvent) => {
-          setFormState({
-            ...formState,
-            password: changeEvent.target.value,
-          })
-        }}
-      />
-      <Button
-        color={'primary'}
-        disabled={getCurrentUserState.taskStatus === 'taskActive'}
-        onClick={() => {
-          getCurrentUser(formState)
-        }}
-      >
-        Sign In
-        {getCurrentUserState.taskStatus === 'taskActive' ? (
-          <CircularProgress
-            size={24}
-            sx={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              marginTop: '-12px',
-              marginLeft: '-12px',
+    <FormDisplay
+      formTitle={'Sign In'}
+      formContent={
+        <Fragment>
+          <SSTextField
+            label={'email'}
+            required={true}
+            value={formValues.email}
+            error={Boolean(formErrors?.email)}
+            helperText={formErrors?.email}
+            onChange={(someChangeEvent) => {
+              setFormValues({
+                email: someChangeEvent.target.value,
+              })
             }}
           />
-        ) : null}
-      </Button>
-    </Stack>
+          <SSTextField
+            type={'password'}
+            label={'password'}
+            required={true}
+            value={formValues.password}
+            error={Boolean(formErrors?.password)}
+            helperText={formErrors?.password}
+            onChange={(someChangeEvent) => {
+              setFormValues({
+                password: someChangeEvent.target.value,
+              })
+            }}
+          />
+        </Fragment>
+      }
+      formActions={
+        <Fragment>
+          <Button
+            fullWidth={true}
+            color={'primary'}
+            disabled={getCurrentUserState.taskStatus === 'taskActive'}
+            onClick={async () => {
+              await validateForm()
+              getCurrentUser(formValues)
+            }}
+          >
+            Sign In
+            {getCurrentUserState.taskStatus === 'taskActive' ? (
+              <CircularProgress
+                size={24}
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: '-12px',
+                  marginLeft: '-12px',
+                }}
+              />
+            ) : null}
+          </Button>
+        </Fragment>
+      }
+      formError={
+        getCurrentUserState.taskStatus === 'taskError' ? (
+          <Typography
+            variant={'subtitle2'}
+            color={'error.main'}
+            textAlign={'center'}
+          >
+            Oops, something happened!
+          </Typography>
+        ) : null
+      }
+    />
   )
 }

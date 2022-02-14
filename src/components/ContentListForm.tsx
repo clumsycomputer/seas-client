@@ -18,6 +18,7 @@ import {
 } from '@mui/material'
 import { Fragment, ReactNode, useEffect, useState } from 'react'
 import * as Yup from 'yup'
+import { useForm, UseFormApi } from '../hooks/useForm'
 import { TaskState } from '../hooks/useTask'
 import {
   ContentItem,
@@ -25,6 +26,7 @@ import {
   ContentList,
   ContentListRating,
 } from '../models/ContentList'
+import { FormDisplay } from './FormDisplay'
 import { SSTextField } from './FormFields'
 import { MenuButton } from './MenuButton'
 
@@ -101,15 +103,6 @@ export function ContentListForm(props: ContentListFormProps) {
   return (
     <FormDisplay
       formTitle={formTitle}
-      cancelDialogFormAction={
-        <Button
-          onClick={() => {
-            cancelContentListForm()
-          }}
-        >
-          Cancel
-        </Button>
-      }
       formContent={
         <Fragment>
           <SSTextField
@@ -412,6 +405,15 @@ export function ContentListForm(props: ContentListFormProps) {
               ) : null}
             </Box>
           </Button>
+          <Box paddingRight={2}>
+            <Button
+              onClick={() => {
+                cancelContentListForm()
+              }}
+            >
+              Cancel
+            </Button>
+          </Box>
         </Fragment>
       }
       formError={
@@ -462,15 +464,6 @@ function ContentItemForm(props: ContentItemFormProps) {
   return (
     <FormDisplay
       formTitle={formTitle}
-      cancelDialogFormAction={
-        <Button
-          onClick={() => {
-            cancelContentItemForm()
-          }}
-        >
-          Cancel
-        </Button>
-      }
       formContent={
         <Fragment>
           <SSTextField
@@ -524,136 +517,37 @@ function ContentItemForm(props: ContentItemFormProps) {
         </Fragment>
       }
       formActions={
-        <Button
-          variant={'contained'}
-          onClick={async () => {
-            await validateForm()
-            updateContentList({
-              contentItemTitle: formValues.contentItemTitle,
-              contentItemAuthor: formValues.contentItemAuthor,
-              contentItemLinks: [
-                {
-                  contentLinkHostName: formValues.contentLinkHostName,
-                  contentLinkUrl: formValues.contentLinkUrl,
-                },
-              ],
-            })
-          }}
-        >
-          {submitLabel}
-        </Button>
+        <Fragment>
+          <Button
+            variant={'contained'}
+            onClick={async () => {
+              await validateForm()
+              updateContentList({
+                contentItemTitle: formValues.contentItemTitle,
+                contentItemAuthor: formValues.contentItemAuthor,
+                contentItemLinks: [
+                  {
+                    contentLinkHostName: formValues.contentLinkHostName,
+                    contentLinkUrl: formValues.contentLinkUrl,
+                  },
+                ],
+              })
+            }}
+          >
+            {submitLabel}
+          </Button>
+          <Box paddingRight={2}>
+            <Button
+              onClick={() => {
+                cancelContentItemForm()
+              }}
+            >
+              Cancel
+            </Button>
+          </Box>
+        </Fragment>
       }
       formError={null}
     />
-  )
-}
-
-interface FormDisplayProps {
-  formTitle: string
-  cancelDialogFormAction: ReactNode
-  formContent: ReactNode
-  formActions: ReactNode
-  formError: ReactNode
-}
-
-function FormDisplay(props: FormDisplayProps) {
-  const {
-    formTitle,
-    cancelDialogFormAction,
-    formContent,
-    formActions,
-    formError,
-  } = props
-  return (
-    <Stack padding={2} spacing={3}>
-      <Stack spacing={0}>
-        <Box display={'flex'} flexDirection={'row'} alignItems={'flex-end'}>
-          <Typography variant={'h6'} paddingBottom={4 / 7}>
-            {formTitle}
-          </Typography>
-          <Box flexGrow={1} />
-          {cancelDialogFormAction}
-        </Box>
-        <Divider sx={{ borderBottomWidth: 2 }} />
-      </Stack>
-      <Stack spacing={2.5}>{formContent}</Stack>
-      <Box
-        display={'flex'}
-        flexDirection={'row-reverse'}
-        paddingTop={3}
-        paddingBottom={1}
-      >
-        {formActions}
-      </Box>
-      {formError}
-    </Stack>
-  )
-}
-
-type StrictFormShape<SomeFormShape extends object> = {
-  [SomeFormKey in keyof SomeFormShape]: SomeFormShape[SomeFormKey]
-}
-
-type FormErrors<
-  SomeFormShape extends object,
-  SomeStrictFormShape = StrictFormShape<SomeFormShape>
-> = {
-  [SomeFieldKey in keyof SomeStrictFormShape]?: string
-}
-
-interface UseFormApi<CurrentFormShape extends object> {
-  formSchema: Yup.SchemaOf<StrictFormShape<CurrentFormShape>>
-  initialFormValues: StrictFormShape<CurrentFormShape>
-}
-
-function useForm<CurrentFormShape extends object>(
-  api: UseFormApi<CurrentFormShape>
-): [
-  formValues: StrictFormShape<CurrentFormShape>,
-  setFormValues: (
-    newFormValues: Partial<StrictFormShape<CurrentFormShape>>
-  ) => void,
-  validateForm: () => Promise<void>,
-  formErrors: FormErrors<CurrentFormShape>
-] {
-  const { initialFormValues, formSchema } = api
-  const [formValues, setFormValues] =
-    useState<StrictFormShape<CurrentFormShape>>(initialFormValues)
-  const [formErrors, setFormErrors] = useState<FormErrors<CurrentFormShape>>({})
-  return [
-    formValues,
-    (newFormValues: Partial<StrictFormShape<CurrentFormShape>>) => {
-      setFormValues({
-        ...formValues,
-        ...newFormValues,
-      })
-    },
-    async () => {
-      try {
-        await formSchema.validate(formValues, {
-          strict: true,
-          abortEarly: false,
-        })
-        setFormErrors({})
-      } catch (someFormValidationError: unknown) {
-        if (someFormValidationError instanceof Yup.ValidationError) {
-          setFormErrors(parseYupFormErrors(someFormValidationError))
-          return Promise.reject()
-        } else {
-          throw new Error('wtf? useForm')
-        }
-      }
-    },
-    formErrors,
-  ]
-}
-
-function parseYupFormErrors(someYupValidationError: Yup.ValidationError): any {
-  return someYupValidationError.inner.reduce<any>(
-    (formErrorsResult, someValidationError) => {
-      formErrorsResult[someValidationError.path!] = someValidationError.type!
-      return formErrorsResult
-    },
-    {} as any
   )
 }
