@@ -40,7 +40,7 @@ export function UserProfilePage() {
       if (currentUser) {
         await SeasService.deleteContentList({
           contentListId,
-          authToken: currentUser.authToken,
+          apiToken: currentUser.apiToken,
         })
       }
     }

@@ -17,7 +17,7 @@ export function getUserCodec() {
 
 export interface CurrentUser extends Pick<User, 'id' | 'username'> {
   email: string
-  authToken: string
+  apiToken: string
 }
 
 export function getCurrentUserCodec() {
@@ -26,7 +26,7 @@ export function getCurrentUserCodec() {
     IO.exact(
       IO.type({
         email: IO.string,
-        authToken: IO.string,
+        apiToken: IO.string,
       })
     ),
   ])

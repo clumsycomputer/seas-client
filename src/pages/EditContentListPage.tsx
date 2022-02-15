@@ -25,7 +25,7 @@ export function EditContentListPage() {
       if (getInitialContentListState.taskStatus === 'taskSuccessful') {
         const initialContentList = getInitialContentListState.taskResult
         const updatedContentList = await SeasService.updateContentList({
-          authToken: currentUser!.authToken,
+          apiToken: currentUser!.apiToken,
           contentListId: initialContentList.id,
           contentListFormData: contentListFormData,
         })

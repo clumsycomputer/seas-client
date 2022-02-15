@@ -12,7 +12,7 @@ export function SignOutPage() {
   const [cancelAuthTokenState, cancelAuthToken] = useTask(async () => {
     if (currentUser) {
       await SeasService.cancelAuthToken({
-        authToken: currentUser.authToken,
+        apiToken: currentUser.apiToken,
       })
     }
   })

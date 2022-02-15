@@ -35,7 +35,7 @@ export function ContentListPage() {
     if (currentUser && getContentListState.taskStatus === 'taskSuccessful') {
       const contentList = getContentListState.taskResult
       await SeasService.deleteContentList({
-        authToken: currentUser.authToken,
+        apiToken: currentUser.apiToken,
         contentListId: contentList.id,
       })
     }

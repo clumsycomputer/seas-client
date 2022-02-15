@@ -28,7 +28,7 @@ function createCurrentUser(api: CreateCurrentUserApi) {
   return fetchSeasData({
     apiRoute: `/current-user/`,
     apiMethod: 'POST',
-    authToken: null,
+    apiToken: null,
     requestBody: {
       email,
       password,
@@ -43,12 +43,12 @@ function createCurrentUser(api: CreateCurrentUserApi) {
     })
 }
 
-interface CancelAuthTokenApi extends Pick<FetchSeasDataApi, 'authToken'> {}
+interface CancelAuthTokenApi extends Pick<FetchSeasDataApi, 'apiToken'> {}
 
 function cancelAuthToken(api: CancelAuthTokenApi) {
-  const { authToken } = api
+  const { apiToken } = api
   return fetchSeasData({
-    authToken,
+    apiToken,
     apiRoute: '/rest-auth/logout/',
     apiMethod: 'POST',
   })
@@ -63,7 +63,7 @@ function getUserProfile(api: GetUserProfileApi) {
   return fetchSeasData({
     apiRoute: `/user-profiles/${userId}/`,
     apiMethod: 'GET',
-    authToken: null,
+    apiToken: null,
   })
     .then((userProfileResponse) => userProfileResponse.json())
     .then((userProfileData: unknown) => {
@@ -83,7 +83,7 @@ function getContentList(api: GetContentListApi) {
   return fetchSeasData({
     apiRoute: `/content-lists/${contentListId}/`,
     apiMethod: 'GET',
-    authToken: null,
+    apiToken: null,
   })
     .then((contentListResponse) => contentListResponse.json())
     .then((contentListData: unknown) => {
@@ -94,7 +94,7 @@ function getContentList(api: GetContentListApi) {
     })
 }
 
-interface CreateContentListApi extends Pick<FetchSeasDataApi, 'authToken'> {
+interface CreateContentListApi extends Pick<FetchSeasDataApi, 'apiToken'> {
   contentListFormData: Pick<
     ContentList,
     'contentListTitle' | 'contentListRating' | 'contentListItems'
@@ -102,9 +102,9 @@ interface CreateContentListApi extends Pick<FetchSeasDataApi, 'authToken'> {
 }
 
 function createContentList(api: CreateContentListApi) {
-  const { authToken, contentListFormData } = api
+  const { apiToken, contentListFormData } = api
   return fetchSeasData({
-    authToken,
+    apiToken,
     apiRoute: `/content-lists/`,
     apiMethod: 'POST',
     requestBody: contentListFormData,
@@ -118,7 +118,7 @@ function createContentList(api: CreateContentListApi) {
     })
 }
 
-interface UpdateContentListApi extends Pick<FetchSeasDataApi, 'authToken'> {
+interface UpdateContentListApi extends Pick<FetchSeasDataApi, 'apiToken'> {
   contentListId: ContentList['id']
   contentListFormData: Pick<
     ContentList,
@@ -127,9 +127,9 @@ interface UpdateContentListApi extends Pick<FetchSeasDataApi, 'authToken'> {
 }
 
 function updateContentList(api: UpdateContentListApi) {
-  const { authToken, contentListId, contentListFormData } = api
+  const { apiToken, contentListId, contentListFormData } = api
   return fetchSeasData({
-    authToken,
+    apiToken,
     apiRoute: `/content-lists/${contentListId}/`,
     apiMethod: 'PUT',
     requestBody: contentListFormData,
@@ -143,14 +143,14 @@ function updateContentList(api: UpdateContentListApi) {
     })
 }
 
-interface DeleteContentListApi extends Pick<FetchSeasDataApi, 'authToken'> {
+interface DeleteContentListApi extends Pick<FetchSeasDataApi, 'apiToken'> {
   contentListId: ContentList['id']
 }
 
 function deleteContentList(api: DeleteContentListApi) {
-  const { authToken, contentListId } = api
+  const { apiToken, contentListId } = api
   return fetchSeasData({
-    authToken,
+    apiToken,
     apiRoute: `/content-lists/${contentListId}/`,
     apiMethod: 'DELETE',
   })
@@ -159,12 +159,12 @@ function deleteContentList(api: DeleteContentListApi) {
 interface FetchSeasDataApi {
   apiRoute: string
   apiMethod: 'GET' | 'POST' | 'PUT' | 'DELETE'
-  authToken: string | null
+  apiToken: string | null
   requestBody?: object
 }
 
 function fetchSeasData(api: FetchSeasDataApi) {
-  const { apiRoute, apiMethod, authToken, requestBody } = api
+  const { apiRoute, apiMethod, apiToken, requestBody } = api
   const requestHeaders: Exclude<
     Parameters<typeof fetch>[1],
     undefined
@@ -172,8 +172,8 @@ function fetchSeasData(api: FetchSeasDataApi) {
     Accept: 'application/json',
     'Content-Type': 'application/json',
   }
-  if (authToken) {
-    requestHeaders['Authorization'] = `Token ${authToken}`
+  if (apiToken) {
+    requestHeaders['Authorization'] = `Token ${apiToken}`
   }
   return fetch(`${'http://localhost:8000'}${apiRoute}`, {
     method: apiMethod,

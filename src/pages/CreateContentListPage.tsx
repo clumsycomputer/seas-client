@@ -18,7 +18,7 @@ export function CreateContentListPage() {
     ) => {
       if (currentUser) {
         const createdContentList = await SeasService.createContentList({
-          authToken: currentUser.authToken,
+          apiToken: currentUser.apiToken,
           contentListFormData: contentListFormState,
         })
         return createdContentList
