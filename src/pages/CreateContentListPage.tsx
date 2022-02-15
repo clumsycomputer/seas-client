@@ -39,7 +39,7 @@ export function CreateContentListPage() {
         <ContentListForm
           formTitle={'Create List'}
           submitLabel={'Publish List'}
-          initialFormValues={{
+          initialFieldValues={{
             contentListTitle: '',
             contentListRating: 'SAFE_FOR_WORK',
             contentListItems: [],

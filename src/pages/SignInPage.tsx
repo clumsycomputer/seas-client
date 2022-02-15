@@ -1,11 +1,15 @@
 import { Button, CircularProgress, Typography } from '@mui/material'
-import { Fragment, useEffect } from 'react'
+import { Fragment, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import { FormDisplay } from '../components/FormDisplay'
 import { SSTextField } from '../components/FormFields'
 import { UserlessPage } from '../components/Page'
-import { useForm } from '../hooks/useForm'
+import {
+  ExternalFormValidationError,
+  getExternalFormValidationError,
+  useForm,
+} from '../hooks/useForm'
 import { TaskState, useTask } from '../hooks/useTask'
 import { CurrentUser } from '../models/User'
 import { SeasService } from '../services/SeasService'
@@ -43,25 +47,51 @@ export function SignInPage() {
 }
 
 interface SignInFormProps {
-  getCurrentUser: (signInFormData: { email: string; password: string }) => void
+  getCurrentUser: (currentUserFormData: CurrentUserFormFields) => void
   getCurrentUserState: TaskState<CurrentUser>
+}
+
+interface CurrentUserFormFields {
+  email: string
+  password: string
 }
 
 function SignInForm(props: SignInFormProps) {
   const { getCurrentUser, getCurrentUserState } = props
-  const [formValues, setFormValues, validateForm, formErrors] = useForm<{
-    email: string
-    password: string
-  }>({
-    initialFormValues: {
-      email: '',
-      password: '',
-    },
-    formSchema: Yup.object({
-      email: Yup.string().email().required(),
-      password: Yup.string().required(),
-    }),
-  })
+  const externalCurrentUserFormValidationError = useMemo<
+    ExternalFormValidationError<CurrentUserFormFields>
+  >(() => {
+    if (
+      getCurrentUserState.taskStatus === 'taskError' &&
+      getCurrentUserState.taskError.validationError
+    ) {
+      return getExternalFormValidationError({
+        someExternalValidationError: getCurrentUserState.taskError,
+      })
+    } else if (getCurrentUserState.taskStatus === 'taskError') {
+      return {
+        formError: 'Oops, something happened!',
+        fieldErrors: {},
+      }
+    } else {
+      return {
+        formError: null,
+        fieldErrors: {},
+      }
+    }
+  }, [getCurrentUserState])
+  const [formState, setFieldValues, validateForm] =
+    useForm<CurrentUserFormFields>({
+      initialFieldValues: {
+        email: '',
+        password: '',
+      },
+      formSchema: Yup.object({
+        email: Yup.string().email().required(),
+        password: Yup.string().required(),
+      }),
+      externalFormValidationError: externalCurrentUserFormValidationError,
+    })
   return (
     <FormDisplay
       formTitle={'Sign In'}
@@ -70,11 +100,11 @@ function SignInForm(props: SignInFormProps) {
           <SSTextField
             label={'email'}
             required={true}
-            value={formValues.email}
-            error={Boolean(formErrors?.email)}
-            helperText={formErrors?.email}
+            value={formState.fieldValues.email}
+            error={Boolean(formState.fieldErrors?.email)}
+            helperText={formState.fieldErrors?.email}
             onChange={(someChangeEvent) => {
-              setFormValues({
+              setFieldValues({
                 email: someChangeEvent.target.value,
               })
             }}
@@ -83,11 +113,11 @@ function SignInForm(props: SignInFormProps) {
             type={'password'}
             label={'password'}
             required={true}
-            value={formValues.password}
-            error={Boolean(formErrors?.password)}
-            helperText={formErrors?.password}
+            value={formState.fieldValues.password}
+            error={Boolean(formState.fieldErrors?.password)}
+            helperText={formState.fieldErrors?.password}
             onChange={(someChangeEvent) => {
-              setFormValues({
+              setFieldValues({
                 password: someChangeEvent.target.value,
               })
             }}
@@ -102,7 +132,7 @@ function SignInForm(props: SignInFormProps) {
             disabled={getCurrentUserState.taskStatus === 'taskActive'}
             onClick={async () => {
               await validateForm()
-              getCurrentUser(formValues)
+              getCurrentUser(formState.fieldValues)
             }}
           >
             Sign In
@@ -122,13 +152,13 @@ function SignInForm(props: SignInFormProps) {
         </Fragment>
       }
       formError={
-        getCurrentUserState.taskStatus === 'taskError' ? (
+        formState.formError ? (
           <Typography
             variant={'subtitle2'}
             color={'error.main'}
             textAlign={'center'}
           >
-            Oops, something happened!
+            {formState.formError}
           </Typography>
         ) : null
       }

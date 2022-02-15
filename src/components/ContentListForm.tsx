@@ -1,12 +1,10 @@
-import { CloseRounded, MoreVert } from '@mui/icons-material'
+import { MoreVert } from '@mui/icons-material'
 import {
   Box,
   Button,
   CircularProgress,
   Dialog,
-  Divider,
   FormControl,
-  IconButton,
   InputLabel,
   Link,
   List,
@@ -16,7 +14,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import { Fragment, ReactNode, useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { useForm, UseFormApi } from '../hooks/useForm'
 import { TaskState } from '../hooks/useTask'
@@ -31,15 +29,15 @@ import { SSTextField } from './FormFields'
 import { MenuButton } from './MenuButton'
 
 export interface ContentListFormProps
-  extends Pick<UseFormApi<ContentListFormValues>, 'initialFormValues'> {
+  extends Pick<UseFormApi<ContentListFormFields>, 'initialFieldValues'> {
   formTitle: string
   submitLabel: string
   submitFormState: TaskState<ContentList>
-  submitForm: (validatedFormValues: ContentListFormValues) => void
+  submitForm: (validateFieldValues: ContentListFormFields) => void
   cancelContentListForm: () => void
 }
 
-interface ContentListFormValues
+interface ContentListFormFields
   extends Pick<
     ContentList,
     'contentListTitle' | 'contentListRating' | 'contentListItems'
@@ -47,46 +45,51 @@ interface ContentListFormValues
 
 export function ContentListForm(props: ContentListFormProps) {
   const {
-    initialFormValues,
+    initialFieldValues,
     formTitle,
     cancelContentListForm,
     submitLabel,
     submitFormState,
     submitForm,
   } = props
-  const [formValues, setFormValues, validateForm, formErrors] = useForm({
-    initialFormValues,
-    formSchema: Yup.object({
-      contentListTitle: Yup.string().required(),
-      contentListRating: Yup.mixed()
-        .oneOf(['SAFE_FOR_WORK', 'NOT_SAFE_FOR_WORK'])
-        .required(),
-      contentListItems: Yup.array(
-        Yup.object({
-          contentItemTitle: Yup.string().required(),
-          contentItemAuthor: Yup.string().required(),
-          contentItemLinks: Yup.array(
-            Yup.object({
-              contentLinkHostName: Yup.string().required(),
-              contentLinkUrl: Yup.string().url().required(),
-            })
-          )
-            .min(1)
-            .required(),
-        })
-      )
-        .min(1)
-        .required(),
-    }),
-  })
+  const [formState, setFieldValues, validateForm] =
+    useForm<ContentListFormFields>({
+      initialFieldValues,
+      formSchema: Yup.object({
+        contentListTitle: Yup.string().required(),
+        contentListRating: Yup.mixed()
+          .oneOf(['SAFE_FOR_WORK', 'NOT_SAFE_FOR_WORK'])
+          .required(),
+        contentListItems: Yup.array(
+          Yup.object({
+            contentItemTitle: Yup.string().required(),
+            contentItemAuthor: Yup.string().required(),
+            contentItemLinks: Yup.array(
+              Yup.object({
+                contentLinkHostName: Yup.string().required(),
+                contentLinkUrl: Yup.string().url().required(),
+              })
+            )
+              .min(1)
+              .required(),
+          })
+        )
+          .min(1)
+          .required(),
+      }),
+      externalFormValidationError: {
+        formError: null,
+        fieldErrors: {},
+      },
+    })
   useEffect(() => {
     if (
-      formErrors.contentListItems === 'min' &&
-      formValues.contentListItems.length > 0
+      formState.fieldErrors?.contentListItems === 'min' &&
+      formState.fieldValues.contentListItems.length > 0
     ) {
       validateForm()
     }
-  }, [formValues, formErrors])
+  }, [formState])
   const [contentItemFormDialogState, setContentItemFormDialogState] = useState<
     | {
         dialogOpen: false
@@ -95,7 +98,7 @@ export function ContentListForm(props: ContentListFormProps) {
         dialogOpen: true
       } & Pick<
         ContentItemFormProps,
-        'formTitle' | 'submitLabel' | 'updateContentList' | 'initialFormValues'
+        'formTitle' | 'submitLabel' | 'updateContentList' | 'initialFieldValues'
       >)
   >({
     dialogOpen: false,
@@ -108,11 +111,11 @@ export function ContentListForm(props: ContentListFormProps) {
           <SSTextField
             required={true}
             label={'Title'}
-            value={formValues.contentListTitle}
-            error={Boolean(formErrors?.contentListTitle)}
-            helperText={formErrors?.contentListTitle}
+            value={formState.fieldValues.contentListTitle}
+            error={Boolean(formState.fieldErrors?.contentListTitle)}
+            helperText={formState.fieldErrors?.contentListTitle}
             onChange={(changeEvent) => {
-              setFormValues({
+              setFieldValues({
                 contentListTitle: changeEvent.target.value,
               })
             }}
@@ -120,9 +123,9 @@ export function ContentListForm(props: ContentListFormProps) {
           <FormControl variant={'standard'} sx={{ m: 1, minWidth: 120 }}>
             <InputLabel required={true}>Content Rating</InputLabel>
             <Select
-              value={formValues.contentListRating}
+              value={formState.fieldValues.contentListRating}
               onChange={(changeEvent) => {
-                setFormValues({
+                setFieldValues({
                   contentListRating: changeEvent.target
                     .value as ContentListRating,
                 })
@@ -136,8 +139,8 @@ export function ContentListForm(props: ContentListFormProps) {
             </Select>
           </FormControl>
           <List>
-            {formValues.contentListItems.length > 0 ? (
-              formValues.contentListItems.map(
+            {formState.fieldValues.contentListItems.length > 0 ? (
+              formState.fieldValues.contentListItems.map(
                 (someContentItem, contentItemIndex) => {
                   return (
                     <ListItem
@@ -155,7 +158,7 @@ export function ContentListForm(props: ContentListFormProps) {
                                     dialogOpen: true,
                                     formTitle: 'Edit Content Item',
                                     submitLabel: 'Update Item',
-                                    initialFormValues: {
+                                    initialFieldValues: {
                                       contentItemTitle:
                                         someContentItem.contentItemTitle,
                                       contentItemAuthor:
@@ -171,14 +174,15 @@ export function ContentListForm(props: ContentListFormProps) {
                                       updatedContentItem
                                     ) => {
                                       const nextContentListItems = [
-                                        ...formValues.contentListItems,
+                                        ...formState.fieldValues
+                                          .contentListItems,
                                       ]
                                       nextContentListItems.splice(
                                         contentItemIndex,
                                         1,
                                         updatedContentItem
                                       )
-                                      setFormValues({
+                                      setFieldValues({
                                         contentListItems: nextContentListItems,
                                       })
                                       setContentItemFormDialogState({
@@ -192,13 +196,13 @@ export function ContentListForm(props: ContentListFormProps) {
                                 children: 'Remove Item',
                                 onClick: () => {
                                   const nextContentListItems = [
-                                    ...formValues.contentListItems,
+                                    ...formState.fieldValues.contentListItems,
                                   ]
                                   nextContentListItems.splice(
                                     contentItemIndex,
                                     1
                                   )
-                                  setFormValues({
+                                  setFieldValues({
                                     contentListItems: nextContentListItems,
                                   })
                                 },
@@ -208,7 +212,7 @@ export function ContentListForm(props: ContentListFormProps) {
                                 disabled: contentItemIndex === 0,
                                 onClick: () => {
                                   const nextContentListItems = [
-                                    ...formValues.contentListItems,
+                                    ...formState.fieldValues.contentListItems,
                                   ]
                                   nextContentListItems.splice(
                                     contentItemIndex - 1,
@@ -218,7 +222,7 @@ export function ContentListForm(props: ContentListFormProps) {
                                       1
                                     )[0]
                                   )
-                                  setFormValues({
+                                  setFieldValues({
                                     contentListItems: nextContentListItems,
                                   })
                                 },
@@ -227,10 +231,12 @@ export function ContentListForm(props: ContentListFormProps) {
                                 children: 'Move Item Down',
                                 disabled:
                                   contentItemIndex ===
-                                  formValues.contentListItems.length - 1,
+                                  formState.fieldValues.contentListItems
+                                    .length -
+                                    1,
                                 onClick: () => {
                                   const nextContentListItems = [
-                                    ...formValues.contentListItems,
+                                    ...formState.fieldValues.contentListItems,
                                   ]
                                   nextContentListItems.splice(
                                     contentItemIndex + 1,
@@ -240,7 +246,7 @@ export function ContentListForm(props: ContentListFormProps) {
                                       1
                                     )[0]
                                   )
-                                  setFormValues({
+                                  setFieldValues({
                                     contentListItems: nextContentListItems,
                                   })
                                 },
@@ -298,7 +304,9 @@ export function ContentListForm(props: ContentListFormProps) {
                     fontSize={14}
                     fontStyle={'italic'}
                     color={
-                      formErrors?.contentListItems ? 'error.main' : 'GrayText'
+                      formState.fieldErrors?.contentListItems
+                        ? 'error.main'
+                        : 'GrayText'
                     }
                   >
                     No Content Items
@@ -316,16 +324,16 @@ export function ContentListForm(props: ContentListFormProps) {
                   dialogOpen: true,
                   formTitle: 'Create Item',
                   submitLabel: 'Add Item',
-                  initialFormValues: {
+                  initialFieldValues: {
                     contentItemTitle: '',
                     contentItemAuthor: '',
                     contentLinkHostName: '',
                     contentLinkUrl: '',
                   },
                   updateContentList: async (newContentItem) => {
-                    setFormValues({
+                    setFieldValues({
                       contentListItems: [
-                        ...formValues.contentListItems,
+                        ...formState.fieldValues.contentListItems,
                         newContentItem,
                       ],
                     })
@@ -342,8 +350,8 @@ export function ContentListForm(props: ContentListFormProps) {
               paddingTop={1}
               alignSelf={'center'}
               visibility={
-                formErrors?.contentListItems === 'min' &&
-                formValues.contentListItems.length === 0
+                formState.fieldErrors?.contentListItems === 'min' &&
+                formState.fieldValues.contentListItems.length === 0
                   ? 'visible'
                   : 'hidden'
               }
@@ -367,7 +375,9 @@ export function ContentListForm(props: ContentListFormProps) {
               <ContentItemForm
                 formTitle={contentItemFormDialogState.formTitle}
                 submitLabel={contentItemFormDialogState.submitLabel}
-                initialFormValues={contentItemFormDialogState.initialFormValues}
+                initialFieldValues={
+                  contentItemFormDialogState.initialFieldValues
+                }
                 updateContentList={contentItemFormDialogState.updateContentList}
                 cancelContentItemForm={() => {
                   setContentItemFormDialogState({
@@ -386,7 +396,7 @@ export function ContentListForm(props: ContentListFormProps) {
             variant={'contained'}
             onClick={async () => {
               await validateForm()
-              submitForm(formValues)
+              submitForm(formState.fieldValues)
             }}
           >
             <Box display={'relative'}>
@@ -433,34 +443,39 @@ export function ContentListForm(props: ContentListFormProps) {
 }
 
 interface ContentItemFormProps
-  extends Pick<UseFormApi<ContentItemFormValues>, 'initialFormValues'> {
+  extends Pick<UseFormApi<ContentItemFormFields>, 'initialFieldValues'> {
   formTitle: string
   submitLabel: string
   cancelContentItemForm: () => void
   updateContentList: (someContentItem: ContentItem) => void
 }
 
-interface ContentItemFormValues
+interface ContentItemFormFields
   extends Pick<ContentItem, 'contentItemTitle' | 'contentItemAuthor'>,
     Pick<ContentLink, 'contentLinkHostName' | 'contentLinkUrl'> {}
 
 function ContentItemForm(props: ContentItemFormProps) {
   const {
     formTitle,
-    initialFormValues,
+    initialFieldValues,
     cancelContentItemForm,
     updateContentList,
     submitLabel,
   } = props
-  const [formValues, setFormValues, validateForm, formErrors] = useForm({
-    initialFormValues,
-    formSchema: Yup.object({
-      contentItemTitle: Yup.string().required(),
-      contentItemAuthor: Yup.string().required(),
-      contentLinkHostName: Yup.string().required(),
-      contentLinkUrl: Yup.string().url().required(),
-    }),
-  })
+  const [formState, setFieldValues, validateForm] =
+    useForm<ContentItemFormFields>({
+      initialFieldValues,
+      formSchema: Yup.object({
+        contentItemTitle: Yup.string().required(),
+        contentItemAuthor: Yup.string().required(),
+        contentLinkHostName: Yup.string().required(),
+        contentLinkUrl: Yup.string().url().required(),
+      }),
+      externalFormValidationError: {
+        formError: null,
+        fieldErrors: {},
+      },
+    })
   return (
     <FormDisplay
       formTitle={formTitle}
@@ -469,11 +484,11 @@ function ContentItemForm(props: ContentItemFormProps) {
           <SSTextField
             required={true}
             label={'Title'}
-            value={formValues.contentItemTitle}
-            error={Boolean(formErrors?.contentItemTitle)}
-            helperText={formErrors?.contentItemTitle}
+            value={formState.fieldValues.contentItemTitle}
+            error={Boolean(formState.fieldErrors?.contentItemTitle)}
+            helperText={formState.fieldErrors?.contentItemTitle}
             onChange={(changeEvent) => {
-              setFormValues({
+              setFieldValues({
                 contentItemTitle: changeEvent.target.value,
               })
             }}
@@ -481,11 +496,11 @@ function ContentItemForm(props: ContentItemFormProps) {
           <SSTextField
             required={true}
             label={'Author'}
-            value={formValues.contentItemAuthor}
-            error={Boolean(formErrors?.contentItemAuthor)}
-            helperText={formErrors?.contentItemAuthor}
+            value={formState.fieldValues.contentItemAuthor}
+            error={Boolean(formState.fieldErrors?.contentItemAuthor)}
+            helperText={formState.fieldErrors?.contentItemAuthor}
             onChange={(changeEvent) => {
-              setFormValues({
+              setFieldValues({
                 contentItemAuthor: changeEvent.target.value,
               })
             }}
@@ -493,11 +508,11 @@ function ContentItemForm(props: ContentItemFormProps) {
           <SSTextField
             required={true}
             label={'Host Name'}
-            value={formValues.contentLinkHostName}
-            error={Boolean(formErrors?.contentLinkHostName)}
-            helperText={formErrors?.contentLinkHostName}
+            value={formState.fieldValues.contentLinkHostName}
+            error={Boolean(formState.fieldErrors?.contentLinkHostName)}
+            helperText={formState.fieldErrors?.contentLinkHostName}
             onChange={(changeEvent) => {
-              setFormValues({
+              setFieldValues({
                 contentLinkHostName: changeEvent.target.value,
               })
             }}
@@ -505,11 +520,11 @@ function ContentItemForm(props: ContentItemFormProps) {
           <SSTextField
             required={true}
             label={'Url'}
-            value={formValues.contentLinkUrl}
-            error={Boolean(formErrors?.contentLinkUrl)}
-            helperText={formErrors?.contentLinkUrl}
+            value={formState.fieldValues.contentLinkUrl}
+            error={Boolean(formState.fieldErrors?.contentLinkUrl)}
+            helperText={formState.fieldErrors?.contentLinkUrl}
             onChange={(changeEvent) => {
-              setFormValues({
+              setFieldValues({
                 contentLinkUrl: changeEvent.target.value,
               })
             }}
@@ -523,12 +538,13 @@ function ContentItemForm(props: ContentItemFormProps) {
             onClick={async () => {
               await validateForm()
               updateContentList({
-                contentItemTitle: formValues.contentItemTitle,
-                contentItemAuthor: formValues.contentItemAuthor,
+                contentItemTitle: formState.fieldValues.contentItemTitle,
+                contentItemAuthor: formState.fieldValues.contentItemAuthor,
                 contentItemLinks: [
                   {
-                    contentLinkHostName: formValues.contentLinkHostName,
-                    contentLinkUrl: formValues.contentLinkUrl,
+                    contentLinkHostName:
+                      formState.fieldValues.contentLinkHostName,
+                    contentLinkUrl: formState.fieldValues.contentLinkUrl,
                   },
                 ],
               })

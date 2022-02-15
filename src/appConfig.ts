@@ -1,7 +1,7 @@
 export interface AppConfig {
   apiUrl: string
 }
-console.log(process.env)
+
 export const appConfig: AppConfig = {
   apiUrl: tryEnviromentVariable({
     variableName: 'REACT_APP_API_URL',

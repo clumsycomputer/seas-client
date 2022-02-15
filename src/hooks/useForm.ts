@@ -1,62 +1,75 @@
-import { string } from 'fp-ts'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 
-export interface UseFormApi<CurrentFormShape extends object> {
-  formSchema: Yup.SchemaOf<StrictFormShape<CurrentFormShape>>
-  initialFormValues: StrictFormShape<CurrentFormShape>
+export interface UseFormApi<FormFields extends object> {
+  initialFieldValues: FormFields
+  formSchema: Yup.SchemaOf<FormFields>
+  externalFormValidationError: ExternalFormValidationError<FormFields>
 }
 
-type StrictFormShape<SomeFormShape extends object> = {
-  [SomeFormKey in keyof SomeFormShape]: SomeFormShape[SomeFormKey]
+interface FormState<FormFields extends object> {
+  fieldValues: FormFields
+  fieldErrors: FormErrors<FormFields>
+  formError: string | null
 }
 
-type FormErrors<
-  SomeFormShape extends object,
-  SomeStrictFormShape = StrictFormShape<SomeFormShape>
-> = {
-  [SomeFieldKey in keyof SomeStrictFormShape]?: string
+type FormErrors<FormFields extends object> = {
+  [SomeFieldKey in keyof FormFields]?: string
 }
 
-export function useForm<CurrentFormShape extends object>(
-  api: UseFormApi<CurrentFormShape>
+export function useForm<FormFields extends object>(
+  api: UseFormApi<FormFields>
 ): [
-  formValues: StrictFormShape<CurrentFormShape>,
-  setFormValues: (
-    newFormValues: Partial<StrictFormShape<CurrentFormShape>>
-  ) => void,
-  validateForm: () => Promise<void>,
-  formErrors: FormErrors<CurrentFormShape>
+  formState: FormState<FormFields>,
+  setFieldValues: (newFieldValues: Partial<FormFields>) => void,
+  validateForm: () => Promise<void>
 ] {
-  const { initialFormValues, formSchema } = api
-  const [formValues, setFormValues] =
-    useState<StrictFormShape<CurrentFormShape>>(initialFormValues)
-  const [formErrors, setFormErrors] = useState<FormErrors<CurrentFormShape>>({})
+  const { initialFieldValues, externalFormValidationError, formSchema } = api
+  const [formState, setFormState] = useState<FormState<FormFields>>({
+    fieldValues: initialFieldValues,
+    fieldErrors: externalFormValidationError.fieldErrors,
+    formError: externalFormValidationError.formError,
+  })
+  useEffect(() => {
+    setFormState({
+      ...formState,
+      ...externalFormValidationError,
+    })
+  }, [externalFormValidationError])
   return [
-    formValues,
-    (newFormValues: Partial<StrictFormShape<CurrentFormShape>>) => {
-      setFormValues({
-        ...formValues,
-        ...newFormValues,
+    formState,
+    (newFieldValues: Partial<FormFields>) => {
+      setFormState({
+        ...formState,
+        fieldValues: {
+          ...formState.fieldValues,
+          ...newFieldValues,
+        },
       })
     },
     async () => {
       try {
-        await formSchema.validate(formValues, {
+        await formSchema.validate(formState.fieldValues, {
           strict: true,
           abortEarly: false,
         })
-        setFormErrors({})
-      } catch (someFormValidationError: unknown) {
-        if (someFormValidationError instanceof Yup.ValidationError) {
-          setFormErrors(parseYupFormErrors(someFormValidationError))
+        setFormState({
+          ...formState,
+          fieldErrors: {},
+        })
+      } catch (someClientValidationError: unknown) {
+        if (someClientValidationError instanceof Yup.ValidationError) {
+          const nextFieldErrors = parseYupFormErrors(someClientValidationError)
+          setFormState({
+            ...formState,
+            fieldErrors: nextFieldErrors,
+          })
           return Promise.reject()
         } else {
           throw new Error('wtf? useForm')
         }
       }
     },
-    formErrors,
   ]
 }
 
@@ -69,5 +82,49 @@ function parseYupFormErrors(
       return formErrorsResult
     },
     {}
+  )
+}
+
+export interface GetExternalFormValidationErrorApi<FormFields extends object> {
+  someExternalValidationError: ExternalValidationError<FormFields>
+}
+
+export type ExternalValidationError<ExternalFormFields extends object> = {
+  validationError: {
+    nonFieldErrors?: Array<string>
+  } & {
+    [ExternalFieldKey in keyof ExternalFormFields]?: Array<string>
+  }
+}
+
+export interface ExternalFormValidationError<FormFields extends object> {
+  formError: string | null
+  fieldErrors: FormErrors<FormFields>
+}
+
+export function getExternalFormValidationError<FormFields extends object>(
+  api: GetExternalFormValidationErrorApi<FormFields>
+): ExternalFormValidationError<FormFields> {
+  const { someExternalValidationError } = api
+  return Object.entries(someExternalValidationError.validationError).reduce<
+    ExternalFormValidationError<FormFields>
+  >(
+    (formErrorsResult, [someValidationErrorKey, someValidationErrorValue]) => {
+      if (
+        someValidationErrorKey === 'nonFieldErrors' &&
+        someValidationErrorValue.length > 0
+      ) {
+        formErrorsResult.formError = someValidationErrorValue[0]
+      } else if (someValidationErrorValue.length > 1) {
+        formErrorsResult.fieldErrors[
+          someValidationErrorKey as keyof FormFields
+        ] = someValidationErrorValue[0]
+      }
+      return formErrorsResult
+    },
+    {
+      formError: null,
+      fieldErrors: {},
+    }
   )
 }

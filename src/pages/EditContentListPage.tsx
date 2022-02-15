@@ -5,7 +5,6 @@ import { LoadingPageBody } from '../components/LoadingPageBody'
 import { UserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
-import { ContentList } from '../models/ContentList'
 import { SeasService } from '../services/SeasService'
 
 export function EditContentListPage() {
@@ -53,7 +52,7 @@ export function EditContentListPage() {
     ) {
       setPageBody(
         <ContentListForm
-          initialFormValues={getInitialContentListState.taskResult}
+          initialFieldValues={getInitialContentListState.taskResult}
           formTitle={'Edit List'}
           submitLabel={'Update List'}
           submitFormState={updateContentListState}

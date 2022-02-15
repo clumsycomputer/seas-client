@@ -164,7 +164,7 @@ interface FetchSeasDataApi {
   requestBody?: object
 }
 
-function fetchSeasData(api: FetchSeasDataApi) {
+async function fetchSeasData(api: FetchSeasDataApi) {
   const { apiRoute, apiMethod, apiToken, requestBody } = api
   const requestHeaders: Exclude<
     Parameters<typeof fetch>[1],
@@ -176,9 +176,15 @@ function fetchSeasData(api: FetchSeasDataApi) {
   if (apiToken) {
     requestHeaders['Authorization'] = `Token ${apiToken}`
   }
-  return fetch(`${appConfig.apiUrl}${apiRoute}`, {
+  const seasResponse = await fetch(`${appConfig.apiUrl}${apiRoute}`, {
     method: apiMethod,
     headers: requestHeaders,
     body: requestBody ? JSON.stringify(requestBody) : null,
   })
+  if (seasResponse.ok) {
+    return seasResponse
+  } else {
+    const errorResponseBody: unknown = await seasResponse.json()
+    throw errorResponseBody
+  }
 }
