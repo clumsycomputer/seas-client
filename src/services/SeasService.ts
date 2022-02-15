@@ -1,4 +1,5 @@
 import * as IO from 'io-ts'
+import { appConfig } from '../appConfig'
 import { decodeData } from '../helpers/decodeData'
 import { ContentList, getContentListCodec } from '../models/ContentList'
 import {
@@ -175,7 +176,7 @@ function fetchSeasData(api: FetchSeasDataApi) {
   if (apiToken) {
     requestHeaders['Authorization'] = `Token ${apiToken}`
   }
-  return fetch(`${'http://localhost:8000'}${apiRoute}`, {
+  return fetch(`${appConfig.apiUrl}${apiRoute}`, {
     method: apiMethod,
     headers: requestHeaders,
     body: requestBody ? JSON.stringify(requestBody) : null,
