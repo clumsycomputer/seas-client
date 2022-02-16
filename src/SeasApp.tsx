@@ -1,4 +1,6 @@
-import { Routes, Route } from 'react-router-dom'
+import { Fragment, ReactNode } from 'react'
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { useCurrentUser } from './hooks/useCurrentUser'
 import { ContentListPage } from './pages/ContentListPage'
 import { CreateContentListPage } from './pages/CreateContentListPage'
 import { EditContentListPage } from './pages/EditContentListPage'
@@ -16,7 +18,11 @@ export function SeasApp() {
       <Route path={'/:userId'} element={<UserProfilePage />} />
       <Route
         path={'/content-list/create'}
-        element={<CreateContentListPage />}
+        element={
+          <CurrentUserPage>
+            <CreateContentListPage />
+          </CurrentUserPage>
+        }
       />
       <Route
         path={'/content-list/:contentListId'}
@@ -24,8 +30,26 @@ export function SeasApp() {
       />
       <Route
         path={'/content-list/:contentListId/edit'}
-        element={<EditContentListPage />}
+        element={
+          <CurrentUserPage>
+            <EditContentListPage />
+          </CurrentUserPage>
+        }
       />
     </Routes>
+  )
+}
+
+interface CurrentUserPageProps {
+  children: ReactNode
+}
+
+function CurrentUserPage(props: CurrentUserPageProps) {
+  const { children } = props
+  const currentUser = useCurrentUser()
+  return currentUser !== null ? (
+    <Fragment>{children}</Fragment>
+  ) : (
+    <Navigate to={'/sign-in'} />
   )
 }

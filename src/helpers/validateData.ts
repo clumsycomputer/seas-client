@@ -10,11 +10,16 @@ export async function validateData<SomeData extends object>(
 ): Promise<SomeData> {
   const { dataSchema, inputData } = api
   try {
-    await dataSchema.validate(inputData, {
-      strict: true,
-      abortEarly: false,
-    })
-    return dataSchema.cast(inputData, { stripUnknown: true }) as SomeData
+    const validatedData = await dataSchema.validate(
+      dataSchema.cast(inputData, {
+        stripUnknown: true,
+      }),
+      {
+        strict: true,
+        abortEarly: false,
+      }
+    )
+    return validatedData as SomeData
   } catch (someValidationError: unknown) {
     if (someValidationError instanceof Yup.ValidationError) {
       const validationErrorDetails = getValidationErrorDetails({

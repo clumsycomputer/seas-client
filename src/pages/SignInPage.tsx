@@ -18,10 +18,10 @@ import { SeasService } from '../services/SeasService'
 export function SignInPage() {
   const navigateToPage = useNavigate()
   const [getCurrentUserState, getCurrentUser] = useTask(
-    async (signInFormState) => {
+    async (currentUserFormData: CurrentUserFormData) => {
       const currentUser = await SeasService.createCurrentUser({
-        email: signInFormState.email,
-        password: signInFormState.password,
+        email: currentUserFormData.email,
+        password: currentUserFormData.password,
       })
       return currentUser
     }
