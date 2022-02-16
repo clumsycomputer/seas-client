@@ -11,7 +11,7 @@ export interface FormDisplayProps {
 export function FormDisplay(props: FormDisplayProps) {
   const { formTitle, formContent, formActions, formError } = props
   return (
-    <Stack padding={2} spacing={2}>
+    <Stack padding={2} spacing={1}>
       <Stack spacing={0}>
         <Box display={'flex'} flexDirection={'row'} alignItems={'flex-end'}>
           <Typography variant={'h6'} paddingBottom={4 / 7}>
@@ -25,11 +25,13 @@ export function FormDisplay(props: FormDisplayProps) {
           }}
         />
       </Stack>
-      <Stack spacing={3}>{formContent}</Stack>
+      <Stack paddingTop={2} spacing={3}>
+        {formContent}
+      </Stack>
       <Box
         display={'flex'}
         flexDirection={'row-reverse'}
-        paddingTop={2}
+        paddingTop={1}
         paddingBottom={1}
       >
         {formActions}

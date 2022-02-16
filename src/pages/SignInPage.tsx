@@ -1,17 +1,18 @@
 import { Button, CircularProgress, Typography } from '@mui/material'
-import { Fragment, useEffect, useMemo } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import * as Yup from 'yup'
 import { FormDisplay } from '../components/FormDisplay'
 import { SSTextField } from '../components/FormFields'
 import { UserlessPage } from '../components/Page'
-import {
-  ExternalFormValidationError,
-  getExternalFormValidationError,
-  useForm,
-} from '../hooks/useForm'
+import { getExternalFormValidationErrorDetails } from '../helpers/getExternalFormValidationError'
+import { validateData } from '../helpers/validateData'
 import { TaskState, useTask } from '../hooks/useTask'
-import { CurrentUser } from '../models/User'
+import { FormErrors, FormState } from '../models/FormState'
+import {
+  CurrentUser,
+  CurrentUserFormData,
+  CurrentUserFormSchema,
+} from '../models/User'
 import { SeasService } from '../services/SeasService'
 
 export function SignInPage() {
@@ -47,51 +48,48 @@ export function SignInPage() {
 }
 
 interface SignInFormProps {
-  getCurrentUser: (currentUserFormData: CurrentUserFormFields) => void
+  getCurrentUser: (currentUserFormData: CurrentUserFormData) => void
   getCurrentUserState: TaskState<CurrentUser>
-}
-
-interface CurrentUserFormFields {
-  email: string
-  password: string
 }
 
 function SignInForm(props: SignInFormProps) {
   const { getCurrentUser, getCurrentUserState } = props
-  const externalCurrentUserFormValidationError = useMemo<
-    ExternalFormValidationError<CurrentUserFormFields>
-  >(() => {
+  const [formState, setFormState] = useState<FormState<CurrentUserFormData>>({
+    fieldValues: {
+      email: '',
+      password: '',
+    },
+    fieldErrors: {},
+    formError: null,
+  })
+  useEffect(() => {
     if (
       getCurrentUserState.taskStatus === 'taskError' &&
       getCurrentUserState.taskError.validationError
     ) {
-      return getExternalFormValidationError({
-        someExternalValidationError: getCurrentUserState.taskError,
+      const externalFormValidationErrorDetails =
+        getExternalFormValidationErrorDetails({
+          someExternalValidationError: getCurrentUserState.taskError,
+        })
+      setFormState({
+        ...formState,
+        fieldErrors: externalFormValidationErrorDetails.fieldErrors,
+        formError: externalFormValidationErrorDetails.formError,
       })
     } else if (getCurrentUserState.taskStatus === 'taskError') {
-      return {
+      setFormState({
+        ...formState,
+        fieldErrors: {},
         formError: 'Oops, something happened!',
-        fieldErrors: {},
-      }
+      })
     } else {
-      return {
-        formError: null,
+      setFormState({
+        ...formState,
         fieldErrors: {},
-      }
+        formError: null,
+      })
     }
   }, [getCurrentUserState])
-  const [formState, setFieldValues, validateForm] =
-    useForm<CurrentUserFormFields>({
-      initialFieldValues: {
-        email: '',
-        password: '',
-      },
-      formSchema: Yup.object({
-        email: Yup.string().email().required(),
-        password: Yup.string().required(),
-      }),
-      externalFormValidationError: externalCurrentUserFormValidationError,
-    })
   return (
     <FormDisplay
       formTitle={'Sign In'}
@@ -104,8 +102,12 @@ function SignInForm(props: SignInFormProps) {
             error={Boolean(formState.fieldErrors?.email)}
             helperText={formState.fieldErrors?.email}
             onChange={(someChangeEvent) => {
-              setFieldValues({
-                email: someChangeEvent.target.value,
+              setFormState({
+                ...formState,
+                fieldValues: {
+                  ...formState.fieldValues,
+                  email: someChangeEvent.target.value,
+                },
               })
             }}
           />
@@ -117,8 +119,12 @@ function SignInForm(props: SignInFormProps) {
             error={Boolean(formState.fieldErrors?.password)}
             helperText={formState.fieldErrors?.password}
             onChange={(someChangeEvent) => {
-              setFieldValues({
-                password: someChangeEvent.target.value,
+              setFormState({
+                ...formState,
+                fieldValues: {
+                  ...formState.fieldValues,
+                  password: someChangeEvent.target.value,
+                },
               })
             }}
           />
@@ -131,8 +137,23 @@ function SignInForm(props: SignInFormProps) {
             color={'primary'}
             disabled={getCurrentUserState.taskStatus === 'taskActive'}
             onClick={async () => {
-              await validateForm()
-              getCurrentUser(formState.fieldValues)
+              try {
+                const validatedFields = await validateData<CurrentUserFormData>(
+                  {
+                    dataSchema: CurrentUserFormSchema,
+                    inputData: formState.fieldValues,
+                  }
+                )
+                getCurrentUser(validatedFields)
+              } catch (someValidationErrorDetailsError: unknown) {
+                const someValidationErrorDetails =
+                  someValidationErrorDetailsError as FormErrors<CurrentUserFormData>
+                setFormState({
+                  ...formState,
+                  fieldErrors: someValidationErrorDetails,
+                  formError: null,
+                })
+              }
             }}
           >
             Sign In
@@ -154,7 +175,7 @@ function SignInForm(props: SignInFormProps) {
       formError={
         formState.formError ? (
           <Typography
-            variant={'subtitle2'}
+            variant={'body2'}
             color={'error.main'}
             textAlign={'center'}
           >

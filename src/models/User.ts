@@ -1,4 +1,5 @@
 import * as IO from 'io-ts'
+import * as Yup from 'yup'
 import { ContentList, getContentListRatingCodec } from './ContentList'
 
 export interface User {
@@ -31,6 +32,16 @@ export function getCurrentUserCodec() {
     ),
   ])
 }
+
+export interface CurrentUserFormData {
+  email: string
+  password: string
+}
+
+export const CurrentUserFormSchema = Yup.object({
+  email: Yup.string().email().required(),
+  password: Yup.string().required(),
+})
 
 export interface UserProfile extends Pick<User, 'id' | 'username'> {
   contentLists: Array<

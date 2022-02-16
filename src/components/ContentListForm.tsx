@@ -15,33 +15,32 @@ import {
   Typography,
 } from '@mui/material'
 import { Fragment, useEffect, useState } from 'react'
-import * as Yup from 'yup'
-import { useForm, UseFormApi } from '../hooks/useForm'
+import { validateData } from '../helpers/validateData'
 import { TaskState } from '../hooks/useTask'
 import {
   ContentItem,
-  ContentLink,
+  ContentItemFormData,
+  ContentItemFormSchema,
   ContentList,
+  ContentListFormData,
+  ContentListFormSchema,
+  ContentListItemsSchema,
   ContentListRating,
 } from '../models/ContentList'
+import { FormErrors, FormState } from '../models/FormState'
 import { FormDisplay } from './FormDisplay'
 import { SSTextField } from './FormFields'
 import { MenuButton } from './MenuButton'
+import * as Yup from 'yup'
 
-export interface ContentListFormProps
-  extends Pick<UseFormApi<ContentListFormFields>, 'initialFieldValues'> {
+export interface ContentListFormProps {
+  initialFieldValues: ContentListFormData
   formTitle: string
   submitLabel: string
   submitFormState: TaskState<ContentList>
-  submitForm: (validateFieldValues: ContentListFormFields) => void
+  submitForm: (validateFieldValues: ContentListFormData) => void
   cancelContentListForm: () => void
 }
-
-interface ContentListFormFields
-  extends Pick<
-    ContentList,
-    'contentListTitle' | 'contentListRating' | 'contentListItems'
-  > {}
 
 export function ContentListForm(props: ContentListFormProps) {
   const {
@@ -52,42 +51,44 @@ export function ContentListForm(props: ContentListFormProps) {
     submitFormState,
     submitForm,
   } = props
-  const [formState, setFieldValues, validateForm] =
-    useForm<ContentListFormFields>({
-      initialFieldValues,
-      formSchema: Yup.object({
-        contentListTitle: Yup.string().required(),
-        contentListRating: Yup.mixed()
-          .oneOf(['SAFE_FOR_WORK', 'NOT_SAFE_FOR_WORK'])
-          .required(),
-        contentListItems: Yup.array(
-          Yup.object({
-            contentItemTitle: Yup.string().required(),
-            contentItemAuthor: Yup.string().required(),
-            contentItemLinks: Yup.array(
-              Yup.object({
-                contentLinkHostName: Yup.string().required(),
-                contentLinkUrl: Yup.string().url().required(),
-              })
-            )
-              .min(1)
-              .required(),
-          })
-        )
-          .min(1)
-          .required(),
-      }),
-      externalFormValidationError: {
-        formError: null,
-        fieldErrors: {},
-      },
-    })
+  const [formState, setFormState] = useState<FormState<ContentListFormData>>({
+    fieldValues: initialFieldValues,
+    fieldErrors: {},
+    formError: null,
+  })
   useEffect(() => {
-    if (
-      formState.fieldErrors?.contentListItems === 'min' &&
-      formState.fieldValues.contentListItems.length > 0
-    ) {
-      validateForm()
+    if (formState.fieldErrors?.contentListItems) {
+      try {
+        validateData<Pick<ContentListFormData, 'contentListItems'>>({
+          dataSchema: Yup.object({
+            contentListItems: ContentListItemsSchema,
+          }).required(),
+          inputData: {
+            contentListItems: formState.fieldValues.contentListItems,
+          },
+        }).then(() => {
+          const { contentListItems, ...remainingFieldErrors } =
+            formState.fieldErrors
+          setFormState({
+            ...formState,
+            fieldErrors: {
+              ...remainingFieldErrors,
+            },
+          })
+        })
+      } catch (someValidationErrorDetailsError: unknown) {
+        const someValidationErrorDetails =
+          someValidationErrorDetailsError as FormErrors<
+            Pick<ContentListFormData, 'contentListItems'>
+          >
+        setFormState({
+          ...formState,
+          fieldErrors: {
+            ...formState.fieldErrors,
+            ...someValidationErrorDetails,
+          },
+        })
+      }
     }
   }, [formState])
   const [contentItemFormDialogState, setContentItemFormDialogState] = useState<
@@ -115,8 +116,12 @@ export function ContentListForm(props: ContentListFormProps) {
             error={Boolean(formState.fieldErrors?.contentListTitle)}
             helperText={formState.fieldErrors?.contentListTitle}
             onChange={(changeEvent) => {
-              setFieldValues({
-                contentListTitle: changeEvent.target.value,
+              setFormState({
+                ...formState,
+                fieldValues: {
+                  ...formState.fieldValues,
+                  contentListTitle: changeEvent.target.value,
+                },
               })
             }}
           />
@@ -125,9 +130,13 @@ export function ContentListForm(props: ContentListFormProps) {
             <Select
               value={formState.fieldValues.contentListRating}
               onChange={(changeEvent) => {
-                setFieldValues({
-                  contentListRating: changeEvent.target
-                    .value as ContentListRating,
+                setFormState({
+                  ...formState,
+                  fieldValues: {
+                    ...formState.fieldValues,
+                    contentListRating: changeEvent.target
+                      .value as ContentListRating,
+                  },
                 })
               }}
               label={'Content Rating'}
@@ -182,8 +191,13 @@ export function ContentListForm(props: ContentListFormProps) {
                                         1,
                                         updatedContentItem
                                       )
-                                      setFieldValues({
-                                        contentListItems: nextContentListItems,
+                                      setFormState({
+                                        ...formState,
+                                        fieldValues: {
+                                          ...formState.fieldValues,
+                                          contentListItems:
+                                            nextContentListItems,
+                                        },
                                       })
                                       setContentItemFormDialogState({
                                         dialogOpen: false,
@@ -202,8 +216,12 @@ export function ContentListForm(props: ContentListFormProps) {
                                     contentItemIndex,
                                     1
                                   )
-                                  setFieldValues({
-                                    contentListItems: nextContentListItems,
+                                  setFormState({
+                                    ...formState,
+                                    fieldValues: {
+                                      ...formState.fieldValues,
+                                      contentListItems: nextContentListItems,
+                                    },
                                   })
                                 },
                               },
@@ -222,8 +240,12 @@ export function ContentListForm(props: ContentListFormProps) {
                                       1
                                     )[0]
                                   )
-                                  setFieldValues({
-                                    contentListItems: nextContentListItems,
+                                  setFormState({
+                                    ...formState,
+                                    fieldValues: {
+                                      ...formState.fieldValues,
+                                      contentListItems: nextContentListItems,
+                                    },
                                   })
                                 },
                               },
@@ -246,8 +268,12 @@ export function ContentListForm(props: ContentListFormProps) {
                                       1
                                     )[0]
                                   )
-                                  setFieldValues({
-                                    contentListItems: nextContentListItems,
+                                  setFormState({
+                                    ...formState,
+                                    fieldValues: {
+                                      ...formState.fieldValues,
+                                      contentListItems: nextContentListItems,
+                                    },
                                   })
                                 },
                               },
@@ -315,7 +341,7 @@ export function ContentListForm(props: ContentListFormProps) {
               </ListItem>
             )}
           </List>
-          <Box display={'flex'} flexDirection={'column'}>
+          <Box paddingBottom={2} display={'flex'} flexDirection={'column'}>
             <Button
               sx={{ alignSelf: 'stretch' }}
               variant={'outlined'}
@@ -331,11 +357,15 @@ export function ContentListForm(props: ContentListFormProps) {
                     contentLinkUrl: '',
                   },
                   updateContentList: async (newContentItem) => {
-                    setFieldValues({
-                      contentListItems: [
-                        ...formState.fieldValues.contentListItems,
-                        newContentItem,
-                      ],
+                    setFormState({
+                      ...formState,
+                      fieldValues: {
+                        ...formState.fieldValues,
+                        contentListItems: [
+                          ...formState.fieldValues.contentListItems,
+                          newContentItem,
+                        ],
+                      },
                     })
                     setContentItemFormDialogState({
                       dialogOpen: false,
@@ -395,8 +425,21 @@ export function ContentListForm(props: ContentListFormProps) {
             disabled={submitFormState.taskStatus === 'taskActive'}
             variant={'contained'}
             onClick={async () => {
-              await validateForm()
-              submitForm(formState.fieldValues)
+              try {
+                const validatedFieldValues =
+                  await validateData<ContentListFormData>({
+                    dataSchema: ContentListFormSchema,
+                    inputData: formState.fieldValues,
+                  })
+                submitForm(validatedFieldValues)
+              } catch (someValidationErrorDetailsError: unknown) {
+                const someValidationErrorDetails =
+                  someValidationErrorDetailsError as FormErrors<ContentListFormData>
+                setFormState({
+                  ...formState,
+                  fieldErrors: someValidationErrorDetails,
+                })
+              }
             }}
           >
             <Box display={'relative'}>
@@ -429,9 +472,9 @@ export function ContentListForm(props: ContentListFormProps) {
       formError={
         submitFormState.taskStatus === 'taskError' ? (
           <Typography
+            variant={'body2'}
             display={'flex'}
             flexDirection={'row-reverse'}
-            variant={'subtitle2'}
             color={'error.main'}
           >
             Oops, something happened!
@@ -442,17 +485,13 @@ export function ContentListForm(props: ContentListFormProps) {
   )
 }
 
-interface ContentItemFormProps
-  extends Pick<UseFormApi<ContentItemFormFields>, 'initialFieldValues'> {
+interface ContentItemFormProps {
+  initialFieldValues: ContentItemFormData
   formTitle: string
   submitLabel: string
   cancelContentItemForm: () => void
   updateContentList: (someContentItem: ContentItem) => void
 }
-
-interface ContentItemFormFields
-  extends Pick<ContentItem, 'contentItemTitle' | 'contentItemAuthor'>,
-    Pick<ContentLink, 'contentLinkHostName' | 'contentLinkUrl'> {}
 
 function ContentItemForm(props: ContentItemFormProps) {
   const {
@@ -462,20 +501,11 @@ function ContentItemForm(props: ContentItemFormProps) {
     updateContentList,
     submitLabel,
   } = props
-  const [formState, setFieldValues, validateForm] =
-    useForm<ContentItemFormFields>({
-      initialFieldValues,
-      formSchema: Yup.object({
-        contentItemTitle: Yup.string().required(),
-        contentItemAuthor: Yup.string().required(),
-        contentLinkHostName: Yup.string().required(),
-        contentLinkUrl: Yup.string().url().required(),
-      }),
-      externalFormValidationError: {
-        formError: null,
-        fieldErrors: {},
-      },
-    })
+  const [formState, setFormState] = useState<FormState<ContentItemFormData>>({
+    fieldValues: initialFieldValues,
+    fieldErrors: {},
+    formError: null,
+  })
   return (
     <FormDisplay
       formTitle={formTitle}
@@ -488,8 +518,12 @@ function ContentItemForm(props: ContentItemFormProps) {
             error={Boolean(formState.fieldErrors?.contentItemTitle)}
             helperText={formState.fieldErrors?.contentItemTitle}
             onChange={(changeEvent) => {
-              setFieldValues({
-                contentItemTitle: changeEvent.target.value,
+              setFormState({
+                ...formState,
+                fieldValues: {
+                  ...formState.fieldValues,
+                  contentItemTitle: changeEvent.target.value,
+                },
               })
             }}
           />
@@ -500,8 +534,12 @@ function ContentItemForm(props: ContentItemFormProps) {
             error={Boolean(formState.fieldErrors?.contentItemAuthor)}
             helperText={formState.fieldErrors?.contentItemAuthor}
             onChange={(changeEvent) => {
-              setFieldValues({
-                contentItemAuthor: changeEvent.target.value,
+              setFormState({
+                ...formState,
+                fieldValues: {
+                  ...formState.fieldValues,
+                  contentItemAuthor: changeEvent.target.value,
+                },
               })
             }}
           />
@@ -512,8 +550,12 @@ function ContentItemForm(props: ContentItemFormProps) {
             error={Boolean(formState.fieldErrors?.contentLinkHostName)}
             helperText={formState.fieldErrors?.contentLinkHostName}
             onChange={(changeEvent) => {
-              setFieldValues({
-                contentLinkHostName: changeEvent.target.value,
+              setFormState({
+                ...formState,
+                fieldValues: {
+                  ...formState.fieldValues,
+                  contentLinkHostName: changeEvent.target.value,
+                },
               })
             }}
           />
@@ -524,8 +566,12 @@ function ContentItemForm(props: ContentItemFormProps) {
             error={Boolean(formState.fieldErrors?.contentLinkUrl)}
             helperText={formState.fieldErrors?.contentLinkUrl}
             onChange={(changeEvent) => {
-              setFieldValues({
-                contentLinkUrl: changeEvent.target.value,
+              setFormState({
+                ...formState,
+                fieldValues: {
+                  ...formState.fieldValues,
+                  contentLinkUrl: changeEvent.target.value,
+                },
               })
             }}
           />
@@ -536,18 +582,31 @@ function ContentItemForm(props: ContentItemFormProps) {
           <Button
             variant={'contained'}
             onClick={async () => {
-              await validateForm()
-              updateContentList({
-                contentItemTitle: formState.fieldValues.contentItemTitle,
-                contentItemAuthor: formState.fieldValues.contentItemAuthor,
-                contentItemLinks: [
-                  {
-                    contentLinkHostName:
-                      formState.fieldValues.contentLinkHostName,
-                    contentLinkUrl: formState.fieldValues.contentLinkUrl,
-                  },
-                ],
-              })
+              try {
+                const validatedFieldValues =
+                  await validateData<ContentItemFormData>({
+                    dataSchema: ContentItemFormSchema,
+                    inputData: formState.fieldValues,
+                  })
+                updateContentList({
+                  contentItemTitle: validatedFieldValues.contentItemTitle,
+                  contentItemAuthor: validatedFieldValues.contentItemAuthor,
+                  contentItemLinks: [
+                    {
+                      contentLinkHostName:
+                        validatedFieldValues.contentLinkHostName,
+                      contentLinkUrl: validatedFieldValues.contentLinkUrl,
+                    },
+                  ],
+                })
+              } catch (someValidationErrorDetailsError: unknown) {
+                const someValidationErrorDetails =
+                  someValidationErrorDetailsError as FormErrors<ContentItemFormData>
+                setFormState({
+                  ...formState,
+                  fieldErrors: someValidationErrorDetails,
+                })
+              }
             }}
           >
             {submitLabel}

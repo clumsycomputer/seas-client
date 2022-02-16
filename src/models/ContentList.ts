@@ -1,4 +1,5 @@
 import * as IO from 'io-ts'
+import * as Yup from 'yup'
 import { User, getUserCodec } from './User'
 
 export interface ContentList {
@@ -57,3 +58,45 @@ export function getContentLinkCodec() {
     })
   )
 }
+
+export interface ContentListFormData
+  extends Pick<
+    ContentList,
+    'contentListTitle' | 'contentListRating' | 'contentListItems'
+  > {}
+
+export const ContentListItemsSchema = Yup.array(
+  Yup.object({
+    contentItemTitle: Yup.string().required(),
+    contentItemAuthor: Yup.string().required(),
+    contentItemLinks: Yup.array(
+      Yup.object({
+        contentLinkHostName: Yup.string().required(),
+        contentLinkUrl: Yup.string().url().required(),
+      })
+    )
+      .min(1)
+      .required(),
+  })
+)
+  .min(1)
+  .required()
+
+export const ContentListFormSchema = Yup.object({
+  contentListTitle: Yup.string().required(),
+  contentListRating: Yup.mixed()
+    .oneOf(['SAFE_FOR_WORK', 'NOT_SAFE_FOR_WORK'])
+    .required(),
+  contentListItems: ContentListItemsSchema,
+}).required()
+
+export interface ContentItemFormData
+  extends Pick<ContentItem, 'contentItemTitle' | 'contentItemAuthor'>,
+    Pick<ContentLink, 'contentLinkHostName' | 'contentLinkUrl'> {}
+
+export const ContentItemFormSchema = Yup.object({
+  contentItemTitle: Yup.string().required(),
+  contentItemAuthor: Yup.string().required(),
+  contentLinkHostName: Yup.string().required(),
+  contentLinkUrl: Yup.string().url().required(),
+}).required()
