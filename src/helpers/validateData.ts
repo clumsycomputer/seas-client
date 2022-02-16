@@ -14,7 +14,7 @@ export async function validateData<SomeData extends object>(
       strict: true,
       abortEarly: false,
     })
-    return inputData
+    return dataSchema.cast(inputData, { stripUnknown: true }) as SomeData
   } catch (someValidationError: unknown) {
     if (someValidationError instanceof Yup.ValidationError) {
       const validationErrorDetails = getValidationErrorDetails({

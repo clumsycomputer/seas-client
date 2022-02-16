@@ -5,6 +5,7 @@ import { LoadingPageBody } from '../components/LoadingPageBody'
 import { UserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
+import { ContentListFormData } from '../models/ContentList'
 import { SeasService } from '../services/SeasService'
 
 export function EditContentListPage() {
@@ -20,7 +21,7 @@ export function EditContentListPage() {
     }
   )
   const [updateContentListState, updateContentList] = useTask(
-    async (contentListFormData) => {
+    async (contentListFormData: ContentListFormData) => {
       if (getInitialContentListState.taskStatus === 'taskSuccessful') {
         const initialContentList = getInitialContentListState.taskResult
         const updatedContentList = await SeasService.updateContentList({
@@ -52,7 +53,14 @@ export function EditContentListPage() {
     ) {
       setPageBody(
         <ContentListForm
-          initialFieldValues={getInitialContentListState.taskResult}
+          initialFieldValues={{
+            contentListTitle:
+              getInitialContentListState.taskResult.contentListTitle,
+            contentListRating:
+              getInitialContentListState.taskResult.contentListRating,
+            contentListItems:
+              getInitialContentListState.taskResult.contentListItems,
+          }}
           formTitle={'Edit List'}
           submitLabel={'Update List'}
           submitFormState={updateContentListState}

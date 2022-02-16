@@ -18,7 +18,6 @@ import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
 import { ContentList } from '../models/ContentList'
 import { SeasService } from '../services/SeasService'
-// import { primary } from '@mui/material/colors'
 
 export function ContentListPage() {
   const currentUser = useCurrentUser()

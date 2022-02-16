@@ -81,6 +81,7 @@ export const ContentListItemsSchema = Yup.array(
 )
   .min(1)
   .required()
+  .strict()
 
 export const ContentListFormSchema = Yup.object({
   contentListTitle: Yup.string().required(),
@@ -88,7 +89,9 @@ export const ContentListFormSchema = Yup.object({
     .oneOf(['SAFE_FOR_WORK', 'NOT_SAFE_FOR_WORK'])
     .required(),
   contentListItems: ContentListItemsSchema,
-}).required()
+})
+  .required()
+  .strict()
 
 export interface ContentItemFormData
   extends Pick<ContentItem, 'contentItemTitle' | 'contentItemAuthor'>,
@@ -99,4 +102,6 @@ export const ContentItemFormSchema = Yup.object({
   contentItemAuthor: Yup.string().required(),
   contentLinkHostName: Yup.string().required(),
   contentLinkUrl: Yup.string().url().required(),
-}).required()
+})
+  .required()
+  .strict()

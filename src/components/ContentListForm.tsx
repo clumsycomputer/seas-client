@@ -15,6 +15,8 @@ import {
   Typography,
 } from '@mui/material'
 import { Fragment, useEffect, useState } from 'react'
+import * as Yup from 'yup'
+import { getExternalFormValidationErrorDetails } from '../helpers/getExternalFormValidationError'
 import { validateData } from '../helpers/validateData'
 import { TaskState } from '../hooks/useTask'
 import {
@@ -31,7 +33,6 @@ import { FormErrors, FormState } from '../models/FormState'
 import { FormDisplay } from './FormDisplay'
 import { SSTextField } from './FormFields'
 import { MenuButton } from './MenuButton'
-import * as Yup from 'yup'
 
 export interface ContentListFormProps {
   initialFieldValues: ContentListFormData
@@ -91,6 +92,34 @@ export function ContentListForm(props: ContentListFormProps) {
       }
     }
   }, [formState])
+  useEffect(() => {
+    if (
+      submitFormState.taskStatus === 'taskError' &&
+      submitFormState.taskError.validationError
+    ) {
+      const externalFormValidationErrorDetails =
+        getExternalFormValidationErrorDetails({
+          someExternalValidationError: submitFormState.taskError,
+        })
+      setFormState({
+        ...formState,
+        fieldErrors: externalFormValidationErrorDetails.fieldErrors,
+        formError: externalFormValidationErrorDetails.formError,
+      })
+    } else if (submitFormState.taskStatus === 'taskError') {
+      setFormState({
+        ...formState,
+        fieldErrors: {},
+        formError: 'Oops, something happened!',
+      })
+    } else {
+      setFormState({
+        ...formState,
+        fieldErrors: {},
+        formError: null,
+      })
+    }
+  }, [submitFormState])
   const [contentItemFormDialogState, setContentItemFormDialogState] = useState<
     | {
         dialogOpen: false
@@ -470,14 +499,14 @@ export function ContentListForm(props: ContentListFormProps) {
         </Fragment>
       }
       formError={
-        submitFormState.taskStatus === 'taskError' ? (
+        formState.formError !== null ? (
           <Typography
             variant={'body2'}
             display={'flex'}
             flexDirection={'row-reverse'}
             color={'error.main'}
           >
-            Oops, something happened!
+            {formState.formError}
           </Typography>
         ) : null
       }

@@ -42,6 +42,8 @@ export const CurrentUserFormSchema = Yup.object({
   email: Yup.string().email().required(),
   password: Yup.string().required(),
 })
+  .required()
+  .strict()
 
 export interface UserProfile extends Pick<User, 'id' | 'username'> {
   contentLists: Array<

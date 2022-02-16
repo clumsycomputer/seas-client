@@ -1,25 +1,21 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  ContentListForm,
-  ContentListFormProps,
-} from '../components/ContentListForm'
+import { ContentListForm } from '../components/ContentListForm'
 import { UserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
+import { ContentListFormData } from '../models/ContentList'
 import { SeasService } from '../services/SeasService'
 
 export function CreateContentListPage() {
   const currentUser = useCurrentUser()
   const navigateToPage = useNavigate()
   const [createContentListState, createContentList] = useTask(
-    async (
-      contentListFormState: Parameters<ContentListFormProps['submitForm']>[0]
-    ) => {
+    async (contentListFormData: ContentListFormData) => {
       if (currentUser) {
         const createdContentList = await SeasService.createContentList({
+          contentListFormData,
           apiToken: currentUser.apiToken,
-          contentListFormData: contentListFormState,
         })
         return createdContentList
       } else {
