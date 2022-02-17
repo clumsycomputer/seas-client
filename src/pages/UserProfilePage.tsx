@@ -24,10 +24,14 @@ export function UserProfilePage() {
   const navigateToPage = useNavigate()
   const currentUser = useCurrentUser()
   const [getUserProfileState, getUserProfile] = useTask(async () => {
-    const userProfile = await SeasService.getUserProfile({
-      userId: parseInt(routeParams.userId!),
-    })
-    return userProfile
+    if (routeParams.username) {
+      const userProfile = await SeasService.getUserProfile({
+        username: routeParams.username,
+      })
+      return userProfile
+    } else {
+      throw new Error('wtf? getUserProfileState')
+    }
   })
   const [deleteUserProfileState, deleteUserProfile] = useTask(
     async (
@@ -58,19 +62,22 @@ export function UserProfilePage() {
     if (
       currentUser &&
       getUserProfileState.taskStatus === 'taskSuccessful' &&
-      currentUser.id === getUserProfileState.taskResult.id
+      currentUser.username === getUserProfileState.taskResult.username
     ) {
       setPageBody(
         <EditableUserProfileDisplay
           userProfile={getUserProfileState.taskResult}
           navigateToCreateContentListPage={() => {
-            navigateToPage(`/content-list/create`, {
-              replace: true,
-            })
+            navigateToPage(
+              `/${getUserProfileState.taskResult.username}/create`,
+              {
+                replace: true,
+              }
+            )
           }}
           navigateToEditContentListPage={(someContentList) => {
             navigateToPage(
-              `/content-list/${someContentList.id}/edit?cancel-route=${window.location.pathname}`,
+              `/${getUserProfileState.taskResult.username}/${someContentList.id}/edit?cancel-route=${window.location.pathname}`,
               {
                 replace: true,
               }
@@ -212,7 +219,7 @@ function UserProfileDisplay(props: UserProfileDisplayProps) {
                   <MuiLink
                     component={Link}
                     replace={true}
-                    to={`/content-list/${someContentList.id}`}
+                    to={`/${userProfile.username}/${someContentList.id}`}
                   >
                     <Typography variant={'subtitle2'} fontWeight={600}>
                       {someContentList.contentListTitle}
@@ -260,7 +267,3 @@ function UserProfileDisplay(props: UserProfileDisplayProps) {
     </Stack>
   )
 }
-
-// const LinkBehavior = React.forwardRef((props, ref) => (
-//   <Link ref={ref} to="/getting-started/installation/" {...props} />
-// ))

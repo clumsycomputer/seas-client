@@ -39,7 +39,7 @@ function LoggedInPage(props: LoggedInPageProps) {
             {
               children: 'Profile',
               onClick: () => {
-                navigateToPage(`/${currentUser.id}`, {
+                navigateToPage(`/${currentUser.username}`, {
                   replace: true,
                 })
               },
@@ -74,7 +74,9 @@ function LoggedOutPage(props: LoggedOutPageProps) {
         <Button
           color={'inherit'}
           onClick={() => {
-            navigateToPage('/sign-in', { replace: true })
+            navigateToPage('/sign-in', {
+              replace: true,
+            })
           }}
         >
           Sign In

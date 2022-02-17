@@ -1,12 +1,16 @@
-import * as IO from 'io-ts'
 import { appConfig } from '../appConfig'
 import { decodeData } from '../helpers/decodeData'
-import { ContentList, getContentListCodec } from '../models/ContentList'
 import {
-  UserProfile,
-  getUserProfileCodec,
+  ContentList,
+  ContentListFormData,
+  getContentListCodec,
+} from '../models/ContentList'
+import {
   CurrentUser,
+  CurrentUserFormData,
   getCurrentUserCodec,
+  getUserProfileCodec,
+  UserProfile,
 } from '../models/User'
 
 export const SeasService = {
@@ -20,19 +24,18 @@ export const SeasService = {
 }
 
 interface CreateCurrentUserApi {
-  email: string
-  password: string
+  currentUserFormData: CurrentUserFormData
 }
 
 function createCurrentUser(api: CreateCurrentUserApi) {
-  const { email, password } = api
+  const { currentUserFormData } = api
   return fetchSeasData({
     apiRoute: `/current-user/`,
     apiMethod: 'POST',
     apiToken: null,
     requestBody: {
-      email,
-      password,
+      email: currentUserFormData.email,
+      password: currentUserFormData.password,
     },
   })
     .then((currentUserResponse) => currentUserResponse.json())
@@ -55,14 +58,12 @@ function cancelAuthToken(api: CancelAuthTokenApi) {
   })
 }
 
-interface GetUserProfileApi {
-  userId: UserProfile['id']
-}
+interface GetUserProfileApi extends Pick<UserProfile, 'username'> {}
 
 function getUserProfile(api: GetUserProfileApi) {
-  const { userId } = api
+  const { username } = api
   return fetchSeasData({
-    apiRoute: `/user-profiles/${userId}/`,
+    apiRoute: `/user-profiles/${username}/`,
     apiMethod: 'GET',
     apiToken: null,
   })
@@ -96,10 +97,7 @@ function getContentList(api: GetContentListApi) {
 }
 
 interface CreateContentListApi extends Pick<FetchSeasDataApi, 'apiToken'> {
-  contentListFormData: Pick<
-    ContentList,
-    'contentListTitle' | 'contentListRating' | 'contentListItems'
-  >
+  contentListFormData: ContentListFormData
 }
 
 function createContentList(api: CreateContentListApi) {
@@ -121,10 +119,7 @@ function createContentList(api: CreateContentListApi) {
 
 interface UpdateContentListApi extends Pick<FetchSeasDataApi, 'apiToken'> {
   contentListId: ContentList['id']
-  contentListFormData: Pick<
-    ContentList,
-    'contentListTitle' | 'contentListRating' | 'contentListItems'
-  >
+  contentListFormData: ContentListFormData
 }
 
 function updateContentList(api: UpdateContentListApi) {

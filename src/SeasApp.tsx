@@ -1,5 +1,5 @@
 import { Fragment, ReactNode } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Params, Route, Routes, useParams } from 'react-router-dom'
 import { useCurrentUser } from './hooks/useCurrentUser'
 import { ContentListPage } from './pages/ContentListPage'
 import { CreateContentListPage } from './pages/CreateContentListPage'
@@ -15,41 +15,71 @@ export function SeasApp() {
       <Route path={'/'} element={<LandingPage />} />
       <Route path={'/sign-in'} element={<SignInPage />} />
       <Route path={'/sign-out'} element={<SignOutPage />} />
-      <Route path={'/:userId'} element={<UserProfilePage />} />
+      <Route path={'/:username'} element={<UserProfilePage />} />
       <Route
-        path={'/content-list/create'}
+        path={'/:username/create'}
         element={
-          <CurrentUserPage>
-            <CreateContentListPage />
-          </CurrentUserPage>
+          <ProtectedPage
+            somePage={<CreateContentListPage />}
+            getUserHasPermission={({ currentUser, routeParams }) => {
+              return currentUser?.username === routeParams.username
+            }}
+            getRedirectionRoute={({ routeParams }) => {
+              return `/${routeParams.username}`
+            }}
+          />
         }
       />
+      <Route path={'/:username/:contentListId'} element={<ContentListPage />} />
       <Route
-        path={'/content-list/:contentListId'}
-        element={<ContentListPage />}
-      />
-      <Route
-        path={'/content-list/:contentListId/edit'}
+        path={'/:username/:contentListId/edit'}
         element={
-          <CurrentUserPage>
-            <EditContentListPage />
-          </CurrentUserPage>
+          <ProtectedPage
+            somePage={<EditContentListPage />}
+            getUserHasPermission={({ currentUser, routeParams }) => {
+              return currentUser?.username === routeParams.username
+            }}
+            getRedirectionRoute={({ routeParams }) => {
+              return `/${routeParams.username}/${routeParams.contentListId}`
+            }}
+          />
         }
       />
     </Routes>
   )
 }
 
-interface CurrentUserPageProps {
-  children: ReactNode
+interface ProtectedPageProps {
+  somePage: ReactNode
+  getUserHasPermission: (api: GetUserHasPermissionApi) => boolean
+  getRedirectionRoute: (api: GetRedirectionRouteApi) => string
 }
 
-function CurrentUserPage(props: CurrentUserPageProps) {
-  const { children } = props
+interface GetUserHasPermissionApi {
+  routeParams: Readonly<Params<string>> // ReturnType<typeof useParams>
+  currentUser: ReturnType<typeof useCurrentUser>
+}
+
+interface GetRedirectionRouteApi {
+  routeParams: Readonly<Params<string>> // ReturnType<typeof useParams>
+  currentUser: ReturnType<typeof useCurrentUser>
+}
+
+function ProtectedPage(props: ProtectedPageProps) {
+  const { getUserHasPermission, getRedirectionRoute, somePage } = props
+  const routeParams = useParams()
   const currentUser = useCurrentUser()
-  return currentUser !== null ? (
-    <Fragment>{children}</Fragment>
+  const userHasPermission = getUserHasPermission({
+    routeParams,
+    currentUser,
+  })
+  const redirectionRoute = getRedirectionRoute({
+    routeParams,
+    currentUser,
+  })
+  return userHasPermission ? (
+    <Fragment>{somePage}</Fragment>
   ) : (
-    <Navigate to={'/sign-in'} />
+    <Navigate to={redirectionRoute} />
   )
 }

@@ -39,10 +39,16 @@ export function EditContentListPage() {
     getInitialContentList()
   }, [])
   useEffect(() => {
-    if (updateContentListState.taskStatus === 'taskSuccessful') {
-      navigateToPage(`/content-list/${updateContentListState.taskResult.id}`, {
-        replace: true,
-      })
+    if (
+      routeParams.username &&
+      updateContentListState.taskStatus === 'taskSuccessful'
+    ) {
+      navigateToPage(
+        `/${routeParams.username}/${updateContentListState.taskResult.id}`,
+        {
+          replace: true,
+        }
+      )
     }
   }, [updateContentListState])
   const [pageBody, setPageBody] = useState<ReactNode>(null)
@@ -68,14 +74,19 @@ export function EditContentListPage() {
             updateContentList(contentListFormData)
           }}
           cancelContentListForm={() => {
-            const currentSearchParams = new URLSearchParams(
-              window.location.search
-            )
-            const cancelRidirectionRoute =
-              currentSearchParams.get('cancel-route')
-            navigateToPage(cancelRidirectionRoute || `/${currentUser.id}`, {
-              replace: true,
-            })
+            if (routeParams.username) {
+              const currentSearchParams = new URLSearchParams(
+                window.location.search
+              )
+              const cancelRidirectionRoute =
+                currentSearchParams.get('cancel-route')
+              navigateToPage(
+                cancelRidirectionRoute || `/${routeParams.username}`,
+                {
+                  replace: true,
+                }
+              )
+            }
           }}
         />
       )

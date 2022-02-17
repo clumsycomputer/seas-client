@@ -20,8 +20,7 @@ export function SignInPage() {
   const [getCurrentUserState, getCurrentUser] = useTask(
     async (currentUserFormData: CurrentUserFormData) => {
       const currentUser = await SeasService.createCurrentUser({
-        email: currentUserFormData.email,
-        password: currentUserFormData.password,
+        currentUserFormData,
       })
       return currentUser
     }
@@ -30,7 +29,7 @@ export function SignInPage() {
     if (getCurrentUserState.taskStatus === 'taskSuccessful') {
       const currentUser = getCurrentUserState.taskResult
       window.localStorage.setItem('currentUser', JSON.stringify(currentUser))
-      navigateToPage(`/${currentUser.id}`, {
+      navigateToPage(`/${getCurrentUserState.taskResult.username}`, {
         replace: true,
       })
     }

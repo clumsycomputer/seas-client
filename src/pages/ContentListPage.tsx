@@ -54,12 +54,14 @@ export function ContentListPage() {
           contentList={getContentListState.taskResult}
           deleteContentList={deleteContentList}
           navigateToEditContentListPage={() => {
-            navigateToPage(
-              `/content-list/${getContentListState.taskResult.id}/edit?cancel-route=${window.location.pathname}`,
-              {
-                replace: true,
-              }
-            )
+            if (routeParams.username) {
+              navigateToPage(
+                `/${routeParams.username}/${getContentListState.taskResult.id}/edit?cancel-route=${window.location.pathname}`,
+                {
+                  replace: true,
+                }
+              )
+            }
           }}
         />
       )
@@ -75,10 +77,16 @@ export function ContentListPage() {
     }
   }, [getContentListState])
   useEffect(() => {
-    if (currentUser && deleteContentListState.taskStatus === 'taskSuccessful') {
-      navigateToPage(`/${currentUser.id}`, {
-        replace: true,
-      })
+    if (
+      getContentListState.taskStatus === 'taskSuccessful' &&
+      deleteContentListState.taskStatus === 'taskSuccessful'
+    ) {
+      navigateToPage(
+        `/${getContentListState.taskResult.contentListAuthor.username}`,
+        {
+          replace: true,
+        }
+      )
     }
   }, [deleteContentListState])
   return <UserPage currentUser={currentUser} pageBody={pageBody} />
@@ -157,7 +165,7 @@ function ContentListPageBody(props: ContentListPageBodyProps) {
             <MuiLink
               component={Link}
               replace={true}
-              to={`/${contentList.contentListAuthor.id}`}
+              to={`/${contentList.contentListAuthor.username}`}
             >
               <Typography variant={'body2'} fontWeight={500}>
                 {contentList.contentListAuthor.username}

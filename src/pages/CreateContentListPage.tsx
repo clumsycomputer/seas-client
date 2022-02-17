@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { ContentListForm } from '../components/ContentListForm'
 import { UserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
@@ -10,6 +10,7 @@ import { SeasService } from '../services/SeasService'
 export function CreateContentListPage() {
   const currentUser = useCurrentUser()
   const navigateToPage = useNavigate()
+  const routeParams = useParams()
   const [createContentListState, createContentList] = useTask(
     async (contentListFormData: ContentListFormData) => {
       if (currentUser) {
@@ -24,8 +25,13 @@ export function CreateContentListPage() {
     }
   )
   useEffect(() => {
-    if (currentUser && createContentListState.taskStatus === 'taskSuccessful') {
-      navigateToPage(`/content-list/${createContentListState.taskResult.id}`)
+    if (
+      routeParams.username &&
+      createContentListState.taskStatus === 'taskSuccessful'
+    ) {
+      navigateToPage(
+        `/${routeParams.username}/${createContentListState.taskResult.id}`
+      )
     }
   }, [createContentListState])
   return (
@@ -45,8 +51,8 @@ export function CreateContentListPage() {
             createContentList(contentListFormState)
           }}
           cancelContentListForm={() => {
-            if (currentUser) {
-              navigateToPage(`/${currentUser.id}`, {
+            if (routeParams.username) {
+              navigateToPage(`/${routeParams.username}`, {
                 replace: true,
               })
             }
