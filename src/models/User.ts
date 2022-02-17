@@ -3,20 +3,18 @@ import * as Yup from 'yup'
 import { ContentList, getContentListRatingCodec } from './ContentList'
 
 export interface User {
-  id: number
   username: string
 }
 
 export function getUserCodec() {
   return IO.exact(
     IO.type({
-      id: IO.number,
       username: IO.string,
     })
   )
 }
 
-export interface CurrentUser extends Pick<User, 'id' | 'username'> {
+export interface CurrentUser extends Pick<User, 'username'> {
   email: string
   apiToken: string
 }
@@ -45,9 +43,9 @@ export const CurrentUserFormSchema = Yup.object({
   .required()
   .strict()
 
-export interface UserProfile extends Pick<User, 'id' | 'username'> {
+export interface UserProfile extends Pick<User, 'username'> {
   contentLists: Array<
-    Pick<ContentList, 'id' | 'contentListTitle' | 'contentListRating'>
+    Pick<ContentList, 'contentListTitle' | 'contentListRating'>
   >
 }
 
@@ -59,7 +57,6 @@ export function getUserProfileCodec() {
         contentLists: IO.array(
           IO.exact(
             IO.type({
-              id: IO.number,
               contentListTitle: IO.string,
               contentListRating: getContentListRatingCodec(),
             })

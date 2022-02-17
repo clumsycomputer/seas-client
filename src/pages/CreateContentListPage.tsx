@@ -30,7 +30,7 @@ export function CreateContentListPage() {
       createContentListState.taskStatus === 'taskSuccessful'
     ) {
       navigateToPage(
-        `/${routeParams.username}/${createContentListState.taskResult.id}`
+        `/${routeParams.username}/${createContentListState.taskResult.contentListTitle}`
       )
     }
   }, [createContentListState])

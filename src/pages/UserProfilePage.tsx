@@ -37,13 +37,13 @@ export function UserProfilePage() {
     async (
       api: Pick<
         Parameters<typeof SeasService.deleteContentList>[0],
-        'contentListId'
+        'contentListTitle'
       >
     ) => {
-      const { contentListId } = api
+      const { contentListTitle } = api
       if (currentUser) {
         await SeasService.deleteContentList({
-          contentListId,
+          contentListTitle,
           apiToken: currentUser.apiToken,
         })
       }
@@ -77,7 +77,7 @@ export function UserProfilePage() {
           }}
           navigateToEditContentListPage={(someContentList) => {
             navigateToPage(
-              `/${getUserProfileState.taskResult.username}/${someContentList.id}/edit?cancel-route=${window.location.pathname}`,
+              `/${getUserProfileState.taskResult.username}/${someContentList.contentListTitle}/edit?cancel-route=${window.location.pathname}`,
               {
                 replace: true,
               }
@@ -85,7 +85,7 @@ export function UserProfilePage() {
           }}
           deleteContentList={(someContentList) => {
             deleteUserProfile({
-              contentListId: someContentList.id,
+              contentListTitle: someContentList.contentListTitle,
             })
           }}
         />
@@ -219,7 +219,7 @@ function UserProfileDisplay(props: UserProfileDisplayProps) {
                   <MuiLink
                     component={Link}
                     replace={true}
-                    to={`/${userProfile.username}/${someContentList.id}`}
+                    to={`/${userProfile.username}/${someContentList.contentListTitle}`}
                   >
                     <Typography variant={'subtitle2'} fontWeight={600}>
                       {someContentList.contentListTitle}

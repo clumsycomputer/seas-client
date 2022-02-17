@@ -3,7 +3,6 @@ import * as Yup from 'yup'
 import { User, getUserCodec } from './User'
 
 export interface ContentList {
-  id: number
   contentListTitle: string
   contentListAuthor: User
   contentListRating: ContentListRating
@@ -13,7 +12,6 @@ export interface ContentList {
 export function getContentListCodec() {
   return IO.exact(
     IO.type({
-      id: IO.number,
       contentListTitle: IO.string,
       contentListAuthor: getUserCodec(),
       contentListRating: getContentListRatingCodec(),

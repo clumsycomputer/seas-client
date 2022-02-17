@@ -76,14 +76,12 @@ function getUserProfile(api: GetUserProfileApi) {
     })
 }
 
-interface GetContentListApi {
-  contentListId: ContentList['id']
-}
+interface GetContentListApi extends Pick<ContentList, 'contentListTitle'> {}
 
 function getContentList(api: GetContentListApi) {
-  const { contentListId } = api
+  const { contentListTitle } = api
   return fetchSeasData({
-    apiRoute: `/content-lists/${contentListId}/`,
+    apiRoute: `/content-lists/${contentListTitle}/`,
     apiMethod: 'GET',
     apiToken: null,
   })
@@ -117,16 +115,17 @@ function createContentList(api: CreateContentListApi) {
     })
 }
 
-interface UpdateContentListApi extends Pick<FetchSeasDataApi, 'apiToken'> {
-  contentListId: ContentList['id']
+interface UpdateContentListApi
+  extends Pick<FetchSeasDataApi, 'apiToken'>,
+    Pick<ContentList, 'contentListTitle'> {
   contentListFormData: ContentListFormData
 }
 
 function updateContentList(api: UpdateContentListApi) {
-  const { apiToken, contentListId, contentListFormData } = api
+  const { apiToken, contentListTitle, contentListFormData } = api
   return fetchSeasData({
     apiToken,
-    apiRoute: `/content-lists/${contentListId}/`,
+    apiRoute: `/content-lists/${contentListTitle}/`,
     apiMethod: 'PUT',
     requestBody: contentListFormData,
   })
@@ -139,15 +138,15 @@ function updateContentList(api: UpdateContentListApi) {
     })
 }
 
-interface DeleteContentListApi extends Pick<FetchSeasDataApi, 'apiToken'> {
-  contentListId: ContentList['id']
-}
+interface DeleteContentListApi
+  extends Pick<FetchSeasDataApi, 'apiToken'>,
+    Pick<ContentList, 'contentListTitle'> {}
 
 function deleteContentList(api: DeleteContentListApi) {
-  const { apiToken, contentListId } = api
+  const { apiToken, contentListTitle } = api
   return fetchSeasData({
     apiToken,
-    apiRoute: `/content-lists/${contentListId}/`,
+    apiRoute: `/content-lists/${contentListTitle}/`,
     apiMethod: 'DELETE',
   })
 }

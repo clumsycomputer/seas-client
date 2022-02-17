@@ -30,9 +30,12 @@ export function SeasApp() {
           />
         }
       />
-      <Route path={'/:username/:contentListId'} element={<ContentListPage />} />
       <Route
-        path={'/:username/:contentListId/edit'}
+        path={'/:username/:contentListTitle'}
+        element={<ContentListPage />}
+      />
+      <Route
+        path={'/:username/:contentListTitle/edit'}
         element={
           <ProtectedPage
             somePage={<EditContentListPage />}

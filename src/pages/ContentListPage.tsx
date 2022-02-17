@@ -24,18 +24,22 @@ export function ContentListPage() {
   const routeParams = useParams()
   const navigateToPage = useNavigate()
   const [getContentListState, getContentList] = useTask(async () => {
-    const getContentListData = await SeasService.getContentList({
-      contentListId: parseInt(routeParams.contentListId!),
-    })
-    const contentList = getContentListData as ContentList
-    return contentList
+    if (routeParams.contentListTitle) {
+      const getContentListData = await SeasService.getContentList({
+        contentListTitle: routeParams.contentListTitle,
+      })
+      const contentList = getContentListData as ContentList
+      return contentList
+    } else {
+      throw new Error('wtf? getContentListState')
+    }
   })
   const [deleteContentListState, deleteContentList] = useTask(async () => {
     if (currentUser && getContentListState.taskStatus === 'taskSuccessful') {
       const contentList = getContentListState.taskResult
       await SeasService.deleteContentList({
         apiToken: currentUser.apiToken,
-        contentListId: contentList.id,
+        contentListTitle: contentList.contentListTitle,
       })
     }
   })
@@ -47,7 +51,8 @@ export function ContentListPage() {
     if (
       currentUser &&
       getContentListState.taskStatus === 'taskSuccessful' &&
-      currentUser.id === getContentListState.taskResult.contentListAuthor.id
+      currentUser.username ===
+        getContentListState.taskResult.contentListAuthor.username
     ) {
       setPageBody(
         <EditableContentListPageBody
@@ -56,7 +61,7 @@ export function ContentListPage() {
           navigateToEditContentListPage={() => {
             if (routeParams.username) {
               navigateToPage(
-                `/${routeParams.username}/${getContentListState.taskResult.id}/edit?cancel-route=${window.location.pathname}`,
+                `/${routeParams.username}/${getContentListState.taskResult.contentListTitle}/edit?cancel-route=${window.location.pathname}`,
                 {
                   replace: true,
                 }
