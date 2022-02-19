@@ -1,6 +1,6 @@
-import { AccountCircle } from '@mui/icons-material'
+import { KeyboardArrowDownRounded } from '@mui/icons-material'
 import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material'
-import { ReactNode } from 'react'
+import React, { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { CurrentUser } from '../models/User'
@@ -33,8 +33,18 @@ function LoggedInPage(props: LoggedInPageProps) {
       pageBody={pageBody}
       currentUserButton={
         <MenuButton
-          buttonColor={'inherit'}
-          buttonIcon={<AccountCircle />}
+          ButtonComponent={React.forwardRef((props, ref) => {
+            return (
+              <Button
+                endIcon={<KeyboardArrowDownRounded color={'inherit'} />}
+                color={'inherit'}
+                ref={ref}
+                {...props}
+              >
+                {currentUser.username}
+              </Button>
+            )
+          })}
           menuItems={[
             {
               children: 'Profile',

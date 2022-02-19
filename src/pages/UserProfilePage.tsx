@@ -1,6 +1,7 @@
 import { AddRounded, MoreVert } from '@mui/icons-material'
 import {
   Box,
+  Button,
   Divider,
   IconButton,
   Link as MuiLink,
@@ -12,7 +13,7 @@ import {
 import React, { ReactNode, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { LoadingPageBody } from '../components/LoadingPageBody'
-import { MenuButton } from '../components/MenuButton'
+import { DenseMenuButton, MenuButton } from '../components/MenuButton'
 import { UserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
@@ -135,18 +136,16 @@ function EditableUserProfileDisplay(props: EditableUserProfileDisplayProps) {
     <UserProfileDisplay
       userProfile={userProfile}
       createContentListButton={
-        <IconButton
+        <Button
           onClick={() => {
             navigateToCreateContentListPage()
           }}
         >
-          <AddRounded />
-        </IconButton>
+          Create List
+        </Button>
       }
       getContentListOptionsButton={(someContentList) => (
-        <MenuButton
-          buttonColor={'default'}
-          buttonIcon={<MoreVert />}
+        <DenseMenuButton
           menuItems={[
             {
               children: 'Edit List',

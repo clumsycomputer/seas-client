@@ -32,7 +32,7 @@ import {
 import { FormErrors, FormState } from '../models/FormState'
 import { FormDisplay } from './FormDisplay'
 import { SSTextField } from './FormFields'
-import { MenuButton } from './MenuButton'
+import { DenseMenuButton, MenuButton } from './MenuButton'
 
 export interface ContentListFormProps {
   initialFieldValues: ContentListFormData
@@ -182,12 +182,10 @@ export function ContentListForm(props: ContentListFormProps) {
                 (someContentItem, contentItemIndex) => {
                   return (
                     <ListItem
-                      key={`${Math.random()}`}
+                      key={`${someContentItem.contentItemTitle}_${contentItemIndex}`}
                       secondaryAction={
                         <Box>
-                          <MenuButton
-                            buttonColor={'default'}
-                            buttonIcon={<MoreVert />}
+                          <DenseMenuButton
                             menuItems={[
                               {
                                 children: 'Edit Item',

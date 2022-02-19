@@ -1,34 +1,29 @@
 import { MoreVert } from '@mui/icons-material'
-import {
-  IconButton,
-  IconButtonProps,
-  Menu,
-  MenuItem,
-  MenuItemProps,
-} from '@mui/material'
-import { Fragment, ReactNode, useRef, useState } from 'react'
+import { IconButton, Menu, MenuItem, MenuItemProps } from '@mui/material'
+import React from 'react'
+import { ForwardRefExoticComponent, Fragment, useRef, useState } from 'react'
 
 export interface MenuButtonProps {
-  buttonColor: IconButtonProps['color']
-  buttonIcon: ReactNode
+  ButtonComponent: ForwardRefExoticComponent<
+    {
+      onClick: () => void
+    } & React.RefAttributes<HTMLButtonElement>
+  >
   menuItems: Array<MenuItemProps>
 }
 
 export function MenuButton(props: MenuButtonProps) {
-  const { buttonColor, buttonIcon, menuItems } = props
+  const { ButtonComponent, menuItems } = props
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   return (
     <Fragment>
-      <IconButton
+      <ButtonComponent
         ref={buttonRef}
-        color={buttonColor}
         onClick={() => {
           setMenuOpen(true)
         }}
-      >
-        {buttonIcon}
-      </IconButton>
+      />
       <Menu
         keepMounted={true}
         anchorOrigin={{
@@ -61,5 +56,28 @@ export function MenuButton(props: MenuButtonProps) {
         })}
       </Menu>
     </Fragment>
+  )
+}
+
+export interface DenseMenuButtonProps
+  extends Pick<MenuButtonProps, 'menuItems'> {}
+
+export function DenseMenuButton(props: DenseMenuButtonProps) {
+  const { menuItems } = props
+  return (
+    <MenuButton
+      menuItems={menuItems}
+      ButtonComponent={React.forwardRef((props, ref) => {
+        return (
+          <IconButton
+            // color={'inherit'}
+            ref={ref}
+            {...props}
+          >
+            <MoreVert />
+          </IconButton>
+        )
+      })}
+    />
   )
 }

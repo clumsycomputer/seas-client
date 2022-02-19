@@ -12,7 +12,7 @@ import {
 import { ReactNode, useEffect, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { LoadingPageBody } from '../components/LoadingPageBody'
-import { MenuButton } from '../components/MenuButton'
+import { DenseMenuButton, MenuButton } from '../components/MenuButton'
 import { UserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
@@ -110,9 +110,7 @@ function EditableContentListPageBody(props: EditableContentPageBodyProps) {
     <ContentListPageBody
       contentList={contentList}
       editContentListMenuButton={
-        <MenuButton
-          buttonColor={'default'}
-          buttonIcon={<MoreVert />}
+        <DenseMenuButton
           menuItems={[
             {
               children: 'Edit List',
