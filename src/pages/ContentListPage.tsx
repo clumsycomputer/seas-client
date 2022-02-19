@@ -10,9 +10,11 @@ import {
 } from '@mui/material'
 import { ReactNode, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { ErrorPageBody } from '../components/ErrorPageBody'
 import { LoadingPageBody } from '../components/LoadingPageBody'
 import { DenseMenuButton } from '../components/MenuButton'
 import { UserPage } from '../components/Page'
+import { getSeasServiceErrorMessage } from '../helpers/getSeasServiceErrorMessage'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
 import { ContentList } from '../models/ContentList'
@@ -76,8 +78,13 @@ export function ContentListPage() {
           contentList={getContentListState.taskResult}
         />
       )
-    } else {
+    } else if (getContentListState.taskStatus === 'taskActive') {
       setPageBody(<LoadingPageBody />)
+    } else if (getContentListState.taskStatus === 'taskError') {
+      const seasServiceErrorMessage = getSeasServiceErrorMessage({
+        someServiceError: getContentListState.taskError,
+      })
+      setPageBody(<ErrorPageBody errorMessage={seasServiceErrorMessage} />)
     }
   }, [getContentListState])
   useEffect(() => {

@@ -1,8 +1,10 @@
 import { ReactNode, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ContentListForm } from '../components/ContentListForm'
+import { ErrorPageBody } from '../components/ErrorPageBody'
 import { LoadingPageBody } from '../components/LoadingPageBody'
 import { UserPage } from '../components/Page'
+import { getSeasServiceErrorMessage } from '../helpers/getSeasServiceErrorMessage'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
 import { ContentListFormData } from '../models/ContentList'
@@ -97,8 +99,16 @@ export function EditContentListPage() {
           }}
         />
       )
-    } else {
+    } else if (
+      getInitialContentListState.taskStatus === 'taskNotInitialized' ||
+      getInitialContentListState.taskStatus === 'taskActive'
+    ) {
       setPageBody(<LoadingPageBody />)
+    } else if (getInitialContentListState.taskStatus === 'taskError') {
+      const seasServiceErrorMessage = getSeasServiceErrorMessage({
+        someServiceError: getInitialContentListState.taskError,
+      })
+      setPageBody(<ErrorPageBody errorMessage={seasServiceErrorMessage} />)
     }
   }, [getInitialContentListState, updateContentListState])
   return <UserPage currentUser={currentUser} pageBody={pageBody} />

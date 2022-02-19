@@ -178,7 +178,10 @@ async function fetchSeasData(api: FetchSeasDataApi) {
   if (seasResponse.ok) {
     return seasResponse
   } else {
-    const errorResponseBody: unknown = await seasResponse.json()
-    throw errorResponseBody
+    const errorResponseBody: object = await seasResponse.json()
+    throw {
+      ...errorResponseBody,
+      statusCode: seasResponse.status,
+    }
   }
 }

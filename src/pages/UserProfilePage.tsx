@@ -10,9 +10,11 @@ import {
 } from '@mui/material'
 import React, { ReactNode, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { ErrorPageBody } from '../components/ErrorPageBody'
 import { LoadingPageBody } from '../components/LoadingPageBody'
 import { DenseMenuButton } from '../components/MenuButton'
 import { UserPage } from '../components/Page'
+import { getSeasServiceErrorMessage } from '../helpers/getSeasServiceErrorMessage'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
 import { UserProfile } from '../models/User'
@@ -100,6 +102,11 @@ export function UserProfilePage() {
       deleteUserProfileState.taskStatus === 'taskNotInitialized'
     ) {
       setPageBody(<LoadingPageBody />)
+    } else if (getUserProfileState.taskStatus === 'taskError') {
+      const seasServiceErrorMessage = getSeasServiceErrorMessage({
+        someServiceError: getUserProfileState.taskError,
+      })
+      setPageBody(<ErrorPageBody errorMessage={seasServiceErrorMessage} />)
     }
   }, [getUserProfileState])
   return <UserPage currentUser={currentUser} pageBody={pageBody} />
