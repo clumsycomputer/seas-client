@@ -96,7 +96,6 @@ function SignInForm(props: SignInFormProps) {
         <Fragment>
           <SSTextField
             label={'email'}
-            required={true}
             value={formState.fieldValues.email}
             error={Boolean(formState.fieldErrors?.email)}
             helperText={formState.fieldErrors?.email}
@@ -113,7 +112,6 @@ function SignInForm(props: SignInFormProps) {
           <SSTextField
             type={'password'}
             label={'password'}
-            required={true}
             value={formState.fieldValues.password}
             error={Boolean(formState.fieldErrors?.password)}
             helperText={formState.fieldErrors?.password}

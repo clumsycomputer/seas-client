@@ -14,9 +14,9 @@ export function EditContentListPage() {
   const navigateToPage = useNavigate()
   const [getInitialContentListState, getInitialContentList] = useTask(
     async () => {
-      if (routeParams.contentListTitle) {
+      if (routeParams.id) {
         const initialContentList = await SeasService.getContentList({
-          contentListTitle: routeParams.contentListTitle,
+          id: routeParams.id,
         })
         return initialContentList
       } else {
@@ -33,7 +33,7 @@ export function EditContentListPage() {
         const initialContentList = getInitialContentListState.taskResult
         const updatedContentList = await SeasService.updateContentList({
           apiToken: currentUser.apiToken,
-          contentListTitle: initialContentList.contentListTitle,
+          id: initialContentList.id,
           contentListFormData: contentListFormData,
         })
         return updatedContentList
@@ -51,7 +51,7 @@ export function EditContentListPage() {
       updateContentListState.taskStatus === 'taskSuccessful'
     ) {
       navigateToPage(
-        `/${routeParams.username}/${updateContentListState.taskResult.contentListTitle}`,
+        `/${routeParams.username}/${updateContentListState.taskResult.contentListSlug}/${updateContentListState.taskResult.id}`,
         {
           replace: true,
         }

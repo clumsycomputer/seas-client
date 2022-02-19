@@ -31,11 +31,11 @@ export function SeasApp() {
         }
       />
       <Route
-        path={'/:username/:contentListTitle'}
+        path={'/:username/:contentListSlug/:id'}
         element={<ContentListPage />}
       />
       <Route
-        path={'/:username/:contentListTitle/edit'}
+        path={'/:username/:contentListSlug/:id/edit'}
         element={
           <ProtectedPage
             somePage={<EditContentListPage />}
@@ -43,7 +43,7 @@ export function SeasApp() {
               return currentUser?.username === routeParams.username
             }}
             getRedirectionRoute={({ routeParams }) => {
-              return `/${routeParams.username}/${routeParams.contentListId}`
+              return `/${routeParams.username}/${routeParams.id}`
             }}
           />
         }

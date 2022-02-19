@@ -139,7 +139,6 @@ export function ContentListForm(props: ContentListFormProps) {
       formContent={
         <Fragment>
           <SSTextField
-            required={true}
             label={'List Name'}
             value={formState.fieldValues.contentListTitle}
             error={Boolean(formState.fieldErrors?.contentListTitle)}
@@ -155,7 +154,7 @@ export function ContentListForm(props: ContentListFormProps) {
             }}
           />
           <FormControl variant={'standard'} sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel required={true}>List Rating</InputLabel>
+            <InputLabel>List Rating</InputLabel>
             <Select
               value={formState.fieldValues.contentListRating}
               onChange={(changeEvent) => {
@@ -538,7 +537,6 @@ function ContentItemForm(props: ContentItemFormProps) {
       formContent={
         <Fragment>
           <SSTextField
-            required={true}
             label={'Content Name'}
             value={formState.fieldValues.contentItemTitle}
             error={Boolean(formState.fieldErrors?.contentItemTitle)}
@@ -554,7 +552,6 @@ function ContentItemForm(props: ContentItemFormProps) {
             }}
           />
           <SSTextField
-            required={true}
             label={'Content Author'}
             value={formState.fieldValues.contentItemAuthor}
             error={Boolean(formState.fieldErrors?.contentItemAuthor)}
@@ -570,7 +567,6 @@ function ContentItemForm(props: ContentItemFormProps) {
             }}
           />
           <SSTextField
-            required={true}
             label={'Content Host'}
             value={formState.fieldValues.contentLinkHostName}
             error={Boolean(formState.fieldErrors?.contentLinkHostName)}
@@ -586,7 +582,6 @@ function ContentItemForm(props: ContentItemFormProps) {
             }}
           />
           <SSTextField
-            required={true}
             label={'Content Url'}
             value={formState.fieldValues.contentLinkUrl}
             error={Boolean(formState.fieldErrors?.contentLinkUrl)}

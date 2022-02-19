@@ -76,12 +76,12 @@ function getUserProfile(api: GetUserProfileApi) {
     })
 }
 
-interface GetContentListApi extends Pick<ContentList, 'contentListTitle'> {}
+interface GetContentListApi extends Pick<ContentList, 'id'> {}
 
 function getContentList(api: GetContentListApi) {
-  const { contentListTitle } = api
+  const { id } = api
   return fetchSeasData({
-    apiRoute: `/content-lists/${contentListTitle}/`,
+    apiRoute: `/content-lists/${id}/`,
     apiMethod: 'GET',
     apiToken: null,
   })
@@ -117,15 +117,15 @@ function createContentList(api: CreateContentListApi) {
 
 interface UpdateContentListApi
   extends Pick<FetchSeasDataApi, 'apiToken'>,
-    Pick<ContentList, 'contentListTitle'> {
+    Pick<ContentList, 'id'> {
   contentListFormData: ContentListFormData
 }
 
 function updateContentList(api: UpdateContentListApi) {
-  const { apiToken, contentListTitle, contentListFormData } = api
+  const { apiToken, id, contentListFormData } = api
   return fetchSeasData({
     apiToken,
-    apiRoute: `/content-lists/${contentListTitle}/`,
+    apiRoute: `/content-lists/${id}/`,
     apiMethod: 'PUT',
     requestBody: contentListFormData,
   })

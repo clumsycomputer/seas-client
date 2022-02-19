@@ -1,9 +1,7 @@
-import { AddRounded, MoreVert } from '@mui/icons-material'
 import {
   Box,
   Button,
   Divider,
-  IconButton,
   Link as MuiLink,
   List,
   ListItem,
@@ -13,7 +11,7 @@ import {
 import React, { ReactNode, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { LoadingPageBody } from '../components/LoadingPageBody'
-import { DenseMenuButton, MenuButton } from '../components/MenuButton'
+import { DenseMenuButton } from '../components/MenuButton'
 import { UserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
@@ -78,7 +76,7 @@ export function UserProfilePage() {
           }}
           navigateToEditContentListPage={(someContentList) => {
             navigateToPage(
-              `/${getUserProfileState.taskResult.username}/${someContentList.contentListTitle}/edit?cancel-route=${window.location.pathname}`,
+              `/${getUserProfileState.taskResult.username}/${someContentList.contentListSlug}/${someContentList.id}/edit?cancel-route=${window.location.pathname}`,
               {
                 replace: true,
               }
@@ -218,7 +216,7 @@ function UserProfileDisplay(props: UserProfileDisplayProps) {
                   <MuiLink
                     component={Link}
                     replace={true}
-                    to={`/${userProfile.username}/${someContentList.contentListTitle}`}
+                    to={`/${userProfile.username}/${someContentList.contentListSlug}/${someContentList.id}`}
                   >
                     <Typography variant={'subtitle2'} fontWeight={600}>
                       {someContentList.contentListTitle}

@@ -5,13 +5,7 @@ interface SSTextFieldProps
   extends Optional<
     Pick<
       Required<TextFieldProps>,
-      | 'type'
-      | 'label'
-      | 'required'
-      | 'value'
-      | 'error'
-      | 'helperText'
-      | 'onChange'
+      'type' | 'label' | 'value' | 'error' | 'helperText' | 'onChange'
     >,
     'type' | 'helperText'
   > {}
@@ -19,7 +13,6 @@ interface SSTextFieldProps
 export function SSTextField(props: SSTextFieldProps) {
   const {
     label,
-    required,
     value,
     error,
     onChange,
@@ -30,7 +23,6 @@ export function SSTextField(props: SSTextFieldProps) {
     <TextField
       type={type}
       label={label}
-      required={required}
       value={value}
       error={error}
       onChange={onChange}

@@ -45,7 +45,10 @@ export const CurrentUserFormSchema = Yup.object({
 
 export interface UserProfile extends Pick<User, 'username'> {
   contentLists: Array<
-    Pick<ContentList, 'contentListTitle' | 'contentListRating'>
+    Pick<
+      ContentList,
+      'id' | 'contentListSlug' | 'contentListTitle' | 'contentListRating'
+    >
   >
 }
 
@@ -57,6 +60,8 @@ export function getUserProfileCodec() {
         contentLists: IO.array(
           IO.exact(
             IO.type({
+              id: IO.string,
+              contentListSlug: IO.string,
               contentListTitle: IO.string,
               contentListRating: getContentListRatingCodec(),
             })

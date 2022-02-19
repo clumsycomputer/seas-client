@@ -1,18 +1,17 @@
-import { MoreVert } from '@mui/icons-material'
 import {
   Box,
   Divider,
+  Link as MuiLink,
   List,
   ListItem,
   Stack,
   Typography,
-  Link as MuiLink,
   useTheme,
 } from '@mui/material'
 import { ReactNode, useEffect, useState } from 'react'
-import { useNavigate, useParams, Link } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { LoadingPageBody } from '../components/LoadingPageBody'
-import { DenseMenuButton, MenuButton } from '../components/MenuButton'
+import { DenseMenuButton } from '../components/MenuButton'
 import { UserPage } from '../components/Page'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import { useTask } from '../hooks/useTask'
@@ -24,9 +23,9 @@ export function ContentListPage() {
   const routeParams = useParams()
   const navigateToPage = useNavigate()
   const [getContentListState, getContentList] = useTask(async () => {
-    if (routeParams.contentListTitle) {
+    if (routeParams.id) {
       const getContentListData = await SeasService.getContentList({
-        contentListTitle: routeParams.contentListTitle,
+        id: routeParams.id,
       })
       const contentList = getContentListData as ContentList
       return contentList
@@ -45,7 +44,7 @@ export function ContentListPage() {
   })
   useEffect(() => {
     getContentList()
-  }, [routeParams.contentListId])
+  }, [routeParams.id])
   const [pageBody, setPageBody] = useState<ReactNode>(null)
   useEffect(() => {
     if (
@@ -61,7 +60,7 @@ export function ContentListPage() {
           navigateToEditContentListPage={() => {
             if (routeParams.username) {
               navigateToPage(
-                `/${routeParams.username}/${getContentListState.taskResult.contentListTitle}/edit?cancel-route=${window.location.pathname}`,
+                `/${routeParams.username}/${getContentListState.taskResult.contentListSlug}/${getContentListState.taskResult.id}/edit?cancel-route=${window.location.pathname}`,
                 {
                   replace: true,
                 }
