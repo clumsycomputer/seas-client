@@ -34,15 +34,12 @@ export function UserProfilePage() {
   })
   const [deleteUserProfileState, deleteUserProfile] = useTask(
     async (
-      api: Pick<
-        Parameters<typeof SeasService.deleteContentList>[0],
-        'contentListTitle'
-      >
+      api: Pick<Parameters<typeof SeasService.deleteContentList>[0], 'id'>
     ) => {
-      const { contentListTitle } = api
+      const { id } = api
       if (currentUser) {
         await SeasService.deleteContentList({
-          contentListTitle,
+          id,
           apiToken: currentUser.apiToken,
         })
       }
@@ -84,7 +81,7 @@ export function UserProfilePage() {
           }}
           deleteContentList={(someContentList) => {
             deleteUserProfile({
-              contentListTitle: someContentList.contentListTitle,
+              id: someContentList.id,
             })
           }}
         />

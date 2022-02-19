@@ -140,13 +140,13 @@ function updateContentList(api: UpdateContentListApi) {
 
 interface DeleteContentListApi
   extends Pick<FetchSeasDataApi, 'apiToken'>,
-    Pick<ContentList, 'contentListTitle'> {}
+    Pick<ContentList, 'id'> {}
 
 function deleteContentList(api: DeleteContentListApi) {
-  const { apiToken, contentListTitle } = api
+  const { apiToken, id } = api
   return fetchSeasData({
     apiToken,
-    apiRoute: `/content-lists/${contentListTitle}/`,
+    apiRoute: `/content-lists/${id}/`,
     apiMethod: 'DELETE',
   })
 }

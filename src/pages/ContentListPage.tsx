@@ -38,7 +38,7 @@ export function ContentListPage() {
       const contentList = getContentListState.taskResult
       await SeasService.deleteContentList({
         apiToken: currentUser.apiToken,
-        contentListTitle: contentList.contentListTitle,
+        id: contentList.id,
       })
     }
   })
