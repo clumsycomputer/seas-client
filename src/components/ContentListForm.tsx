@@ -140,7 +140,7 @@ export function ContentListForm(props: ContentListFormProps) {
         <Fragment>
           <SSTextField
             required={true}
-            label={'Title'}
+            label={'List Name'}
             value={formState.fieldValues.contentListTitle}
             error={Boolean(formState.fieldErrors?.contentListTitle)}
             helperText={formState.fieldErrors?.contentListTitle}
@@ -155,7 +155,7 @@ export function ContentListForm(props: ContentListFormProps) {
             }}
           />
           <FormControl variant={'standard'} sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel required={true}>Content Rating</InputLabel>
+            <InputLabel required={true}>List Rating</InputLabel>
             <Select
               value={formState.fieldValues.contentListRating}
               onChange={(changeEvent) => {
@@ -168,7 +168,6 @@ export function ContentListForm(props: ContentListFormProps) {
                   },
                 })
               }}
-              label={'Content Rating'}
             >
               <MenuItem value={'SAFE_FOR_WORK'}>Safe for Work</MenuItem>
               <MenuItem value={'NOT_SAFE_FOR_WORK'}>
@@ -540,7 +539,7 @@ function ContentItemForm(props: ContentItemFormProps) {
         <Fragment>
           <SSTextField
             required={true}
-            label={'Title'}
+            label={'Content Name'}
             value={formState.fieldValues.contentItemTitle}
             error={Boolean(formState.fieldErrors?.contentItemTitle)}
             helperText={formState.fieldErrors?.contentItemTitle}
@@ -556,7 +555,7 @@ function ContentItemForm(props: ContentItemFormProps) {
           />
           <SSTextField
             required={true}
-            label={'Author'}
+            label={'Content Author'}
             value={formState.fieldValues.contentItemAuthor}
             error={Boolean(formState.fieldErrors?.contentItemAuthor)}
             helperText={formState.fieldErrors?.contentItemAuthor}
@@ -572,7 +571,7 @@ function ContentItemForm(props: ContentItemFormProps) {
           />
           <SSTextField
             required={true}
-            label={'Host Name'}
+            label={'Content Host'}
             value={formState.fieldValues.contentLinkHostName}
             error={Boolean(formState.fieldErrors?.contentLinkHostName)}
             helperText={formState.fieldErrors?.contentLinkHostName}
@@ -588,7 +587,7 @@ function ContentItemForm(props: ContentItemFormProps) {
           />
           <SSTextField
             required={true}
-            label={'Url'}
+            label={'Content Url'}
             value={formState.fieldValues.contentLinkUrl}
             error={Boolean(formState.fieldErrors?.contentLinkUrl)}
             helperText={formState.fieldErrors?.contentLinkUrl}
