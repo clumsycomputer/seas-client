@@ -69,11 +69,7 @@ export function DenseMenuButton(props: DenseMenuButtonProps) {
       menuItems={menuItems}
       ButtonComponent={React.forwardRef((props, ref) => {
         return (
-          <IconButton
-            // color={'inherit'}
-            ref={ref}
-            {...props}
-          >
+          <IconButton ref={ref} {...props}>
             <MoreVert />
           </IconButton>
         )

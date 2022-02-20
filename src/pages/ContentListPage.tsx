@@ -1,6 +1,7 @@
 import {
   Box,
   Divider,
+  IconButton,
   Link as MuiLink,
   List,
   ListItem,
@@ -74,7 +75,9 @@ export function ContentListPage() {
     } else if (getContentListState.taskStatus === 'taskSuccessful') {
       setPageBody(
         <ContentListPageBody
-          editContentListMenuButton={null}
+          editContentListMenuButton={
+            <IconButton sx={{ visibility: 'hidden' }} />
+          }
           contentList={getContentListState.taskResult}
         />
       )

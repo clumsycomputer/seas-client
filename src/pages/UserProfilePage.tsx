@@ -91,7 +91,9 @@ export function UserProfilePage() {
     } else if (getUserProfileState.taskStatus === 'taskSuccessful') {
       setPageBody(
         <UserProfileDisplay
-          createContentListButton={null}
+          createContentListButton={
+            <Button sx={{ visibility: 'hidden' }}>space holder</Button>
+          }
           getContentListOptionsButton={() => null}
           userProfile={getUserProfileState.taskResult}
         />
