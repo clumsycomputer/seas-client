@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { appTheme } from './appTheme'
 import reportWebVitals from './reportWebVitals'
 import { SeasApp } from './SeasApp'
+import * as Yup from 'yup'
 
 ReactDOM.render(
   <React.StrictMode>

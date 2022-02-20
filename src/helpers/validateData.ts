@@ -1,5 +1,18 @@
 import * as Yup from 'yup'
 
+Yup.setLocale({
+  string: {
+    url: 'must be a valid url',
+    email: 'must be a valid email',
+    max: ({ max }) => `must be no more than ${max} characters`,
+  },
+  mixed: {
+    required: 'required',
+  },
+})
+
+export { Yup }
+
 export interface ValidateDataApi<SomeData extends object> {
   dataSchema: Yup.SchemaOf<SomeData>
   inputData: SomeData
@@ -43,7 +56,7 @@ function getValidationErrorDetails(
   return someValidationError.inner.reduce<Record<string, string>>(
     (validationErrorDetailsResult, someValidationError) => {
       validationErrorDetailsResult[someValidationError.path!] =
-        someValidationError.type!
+        someValidationError.message
       return validationErrorDetailsResult
     },
     {}

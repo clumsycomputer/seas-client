@@ -1,4 +1,3 @@
-import { MoreVert } from '@mui/icons-material'
 import {
   Box,
   Button,
@@ -15,9 +14,8 @@ import {
   Typography,
 } from '@mui/material'
 import { Fragment, useEffect, useState } from 'react'
-import * as Yup from 'yup'
 import { getExternalFormValidationErrorDetails } from '../helpers/getExternalFormValidationError'
-import { validateData } from '../helpers/validateData'
+import { validateData, Yup } from '../helpers/validateData'
 import { TaskState } from '../hooks/useTask'
 import {
   ContentItem,
@@ -32,7 +30,7 @@ import {
 import { FormErrors, FormState } from '../models/FormState'
 import { FormDisplay } from './FormDisplay'
 import { SSTextField } from './FormFields'
-import { DenseMenuButton, MenuButton } from './MenuButton'
+import { DenseMenuButton } from './MenuButton'
 
 export interface ContentListFormProps {
   initialFieldValues: ContentListFormData
@@ -405,7 +403,7 @@ export function ContentListForm(props: ContentListFormProps) {
               paddingTop={1}
               alignSelf={'center'}
               visibility={
-                formState.fieldErrors?.contentListItems === 'min' &&
+                formState.fieldErrors?.contentListItems &&
                 formState.fieldValues.contentListItems.length === 0
                   ? 'visible'
                   : 'hidden'
@@ -414,7 +412,7 @@ export function ContentListForm(props: ContentListFormProps) {
               fontStyle={'italic'}
               color={'error.main'}
             >
-              There must be at least one Content Item
+              {formState.fieldErrors?.contentListItems}
             </Typography>
           </Box>
           <Dialog
@@ -495,7 +493,7 @@ export function ContentListForm(props: ContentListFormProps) {
         </Fragment>
       }
       formError={
-        formState.formError !== null ? (
+        formState.formError ? (
           <Typography
             variant={'body2'}
             display={'flex'}

@@ -32,7 +32,7 @@ export function getExternalFormValidationErrorDetails<FormData extends object>(
         someValidationErrorValue.length > 0
       ) {
         formErrorsResult.formError = someValidationErrorValue[0]
-      } else if (someValidationErrorValue.length > 1) {
+      } else if (someValidationErrorValue.length > 0) {
         formErrorsResult.fieldErrors[someValidationErrorKey as keyof FormData] =
           someValidationErrorValue[0]
       }

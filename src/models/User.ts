@@ -1,5 +1,5 @@
 import * as IO from 'io-ts'
-import * as Yup from 'yup'
+import { Yup } from '../helpers/validateData'
 import { ContentList, getContentListRatingCodec } from './ContentList'
 
 export interface User {
@@ -37,8 +37,8 @@ export interface CurrentUserFormData {
 }
 
 export const CurrentUserFormSchema = Yup.object({
-  email: Yup.string().email().required(),
-  password: Yup.string().required(),
+  email: Yup.string().email().required('please enter an email'),
+  password: Yup.string().required('please enter a password'),
 })
   .required()
   .strict()

@@ -1,5 +1,5 @@
 import * as IO from 'io-ts'
-import * as Yup from 'yup'
+import { Yup } from '../helpers/validateData'
 import { User, getUserCodec } from './User'
 
 export interface ContentList {
@@ -81,7 +81,7 @@ export const ContentListItemsSchema = Yup.array(
       .required(),
   })
 )
-  .min(1)
+  .min(1, 'must be at least one content item')
   .required()
   .strict()
 
@@ -100,10 +100,10 @@ export interface ContentItemFormData
     Pick<ContentLink, 'contentLinkHostName' | 'contentLinkUrl'> {}
 
 export const ContentItemFormSchema = Yup.object({
-  contentItemTitle: Yup.string().required(),
-  contentItemAuthor: Yup.string().required(),
-  contentLinkHostName: Yup.string().required(),
-  contentLinkUrl: Yup.string().url().required(),
+  contentItemTitle: Yup.string().max(50).required(),
+  contentItemAuthor: Yup.string().max(50).required(),
+  contentLinkHostName: Yup.string().max(50).required(),
+  contentLinkUrl: Yup.string().url().max(200).required(),
 })
   .required()
   .strict()
