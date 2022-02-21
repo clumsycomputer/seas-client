@@ -17,7 +17,7 @@ import { SeasService } from '../services/SeasService'
 
 export function SignInPage() {
   const navigateToPage = useNavigate()
-  const [getCurrentUserState, getCurrentUser] = useTask(
+  const [createCurrentUserState, createCurrentUser] = useTask(
     async (currentUserFormData: CurrentUserFormData) => {
       const currentUser = await SeasService.createCurrentUser({
         currentUserFormData,
@@ -26,20 +26,20 @@ export function SignInPage() {
     }
   )
   useEffect(() => {
-    if (getCurrentUserState.taskStatus === 'taskSuccessful') {
-      const currentUser = getCurrentUserState.taskResult
+    if (createCurrentUserState.taskStatus === 'taskSuccessful') {
+      const currentUser = createCurrentUserState.taskResult
       window.localStorage.setItem('currentUser', JSON.stringify(currentUser))
-      navigateToPage(`/${getCurrentUserState.taskResult.username}`, {
+      navigateToPage(`/${createCurrentUserState.taskResult.username}`, {
         replace: true,
       })
     }
-  }, [getCurrentUserState])
+  }, [createCurrentUserState])
   return (
     <UserlessPage
       pageBody={
         <SignInForm
-          getCurrentUserState={getCurrentUserState}
-          getCurrentUser={getCurrentUser}
+          createCurrentUserState={createCurrentUserState}
+          createCurrentUser={createCurrentUser}
         />
       }
     />
@@ -47,12 +47,12 @@ export function SignInPage() {
 }
 
 interface SignInFormProps {
-  getCurrentUser: (currentUserFormData: CurrentUserFormData) => void
-  getCurrentUserState: TaskState<CurrentUser>
+  createCurrentUser: (currentUserFormData: CurrentUserFormData) => void
+  createCurrentUserState: TaskState<CurrentUser>
 }
 
 function SignInForm(props: SignInFormProps) {
-  const { getCurrentUser, getCurrentUserState } = props
+  const { createCurrentUser, createCurrentUserState } = props
   const [formState, setFormState] = useState<FormState<CurrentUserFormData>>({
     fieldValues: {
       email: '',
@@ -63,19 +63,19 @@ function SignInForm(props: SignInFormProps) {
   })
   useEffect(() => {
     if (
-      getCurrentUserState.taskStatus === 'taskError' &&
-      getCurrentUserState.taskError.validationError
+      createCurrentUserState.taskStatus === 'taskError' &&
+      createCurrentUserState.taskError.validationError
     ) {
       const externalFormValidationErrorDetails =
         getExternalFormValidationErrorDetails({
-          someExternalValidationError: getCurrentUserState.taskError,
+          someExternalValidationError: createCurrentUserState.taskError,
         })
       setFormState({
         ...formState,
         fieldErrors: externalFormValidationErrorDetails.fieldErrors,
         formError: externalFormValidationErrorDetails.formError,
       })
-    } else if (getCurrentUserState.taskStatus === 'taskError') {
+    } else if (createCurrentUserState.taskStatus === 'taskError') {
       setFormState({
         ...formState,
         fieldErrors: {},
@@ -88,7 +88,7 @@ function SignInForm(props: SignInFormProps) {
         formError: null,
       })
     }
-  }, [getCurrentUserState])
+  }, [createCurrentUserState])
   return (
     <FormDisplay
       formTitle={'Sign In'}
@@ -132,7 +132,7 @@ function SignInForm(props: SignInFormProps) {
           <Button
             fullWidth={true}
             color={'primary'}
-            disabled={getCurrentUserState.taskStatus === 'taskActive'}
+            disabled={createCurrentUserState.taskStatus === 'taskActive'}
             onClick={async () => {
               try {
                 const validatedFields = await validateData<CurrentUserFormData>(
@@ -141,7 +141,7 @@ function SignInForm(props: SignInFormProps) {
                     inputData: formState.fieldValues,
                   }
                 )
-                getCurrentUser(validatedFields)
+                createCurrentUser(validatedFields)
               } catch (someValidationErrorDetailsError: unknown) {
                 const someValidationErrorDetails =
                   someValidationErrorDetailsError as FormErrors<CurrentUserFormData>
@@ -154,7 +154,7 @@ function SignInForm(props: SignInFormProps) {
             }}
           >
             Sign In
-            {getCurrentUserState.taskStatus === 'taskActive' ? (
+            {createCurrentUserState.taskStatus === 'taskActive' ? (
               <CircularProgress
                 size={24}
                 sx={{

@@ -15,7 +15,7 @@ import {
 
 export const SeasService = {
   createCurrentUser,
-  cancelAuthToken,
+  deleteCurrentUser,
   getUserProfile,
   getContentList,
   createContentList,
@@ -30,7 +30,7 @@ interface CreateCurrentUserApi {
 function createCurrentUser(api: CreateCurrentUserApi) {
   const { currentUserFormData } = api
   return fetchSeasData({
-    apiRoute: `/current-user/`,
+    apiRoute: `/current-user/sign-in/`,
     apiMethod: 'POST',
     apiToken: null,
     requestBody: {
@@ -47,13 +47,13 @@ function createCurrentUser(api: CreateCurrentUserApi) {
     })
 }
 
-interface CancelAuthTokenApi extends Pick<FetchSeasDataApi, 'apiToken'> {}
+interface DeleteCurrentUserApi extends Pick<FetchSeasDataApi, 'apiToken'> {}
 
-function cancelAuthToken(api: CancelAuthTokenApi) {
+function deleteCurrentUser(api: DeleteCurrentUserApi) {
   const { apiToken } = api
   return fetchSeasData({
     apiToken,
-    apiRoute: '/rest-auth/logout/',
+    apiRoute: '/current-user/sign-out/',
     apiMethod: 'POST',
   })
 }
